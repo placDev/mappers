@@ -1,0 +1,43 @@
+{
+  "name": "mapper-lite",
+  "version": "0.0.1",
+  "description": "A versatile and powerful tool that allows you to organize convenient mapping between the layers of your application",
+  "keywords": [
+    "mapper",
+    "dto",
+    "domain",
+    "map",
+    "layer",
+    "backend",
+    "onion",
+    "node",
+    "nestjs",
+    "typescript",
+    "package",
+    "npm"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/placDev/mapper-lite.git"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "copy-readme": "cp ./../README.md ./README.md",
+    "build": "npm run compile && npm run copy-readme",
+    "test-build": "tsc && npm pack"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1"
+  }
+}
