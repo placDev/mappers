@@ -42,6 +42,7 @@ class TestMap extends MapperBase<TestDto, Test, TestEntity> {
   protected toEntity(domain: Test): TestEntity {
     return this.plainToEntity({
       one: domain.one,
+      array: []
     });
   }
 }

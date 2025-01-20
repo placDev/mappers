@@ -5,11 +5,20 @@ import {
 } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import {NotImplementedException} from "./errors";
+import {Options} from "./mapper-settings";
 
 type IsMethod<T> = T extends (...args: any[]) => any ? true : false
 type ClassFields<T> = Pick<T, {
     [K in keyof T]: IsMethod<T[K]> extends true ? never : K
 }[keyof T]>;
+
+type DomainConditionalOptional<T, O extends Options> = O["domain"]['makeOptional'] extends true
+    ? Partial<T>
+    : T;
+
+type EntityConditionalOptional<T, O extends Options> = O["entity"]['makeOptional'] extends true
+    ? Partial<T>
+    : T;
 
 export enum SourceType {
     Dto,
@@ -17,7 +26,7 @@ export enum SourceType {
     Entity,
 }
 
-export abstract class MapperBase<Dto, Domain, Entity = undefined> {
+export abstract class ConfigurableMapper<Dto, Domain, Entity, O extends Options> {
     protected constructor(
         protected dtoConstructor: ClassConstructor<Dto>,
         protected domainConstructor: ClassConstructor<Domain>,
@@ -55,12 +64,12 @@ export abstract class MapperBase<Dto, Domain, Entity = undefined> {
     }
 
     // TODO Сделать исключения свойств которых нет в Domain
-    protected plainToDomain(value: Partial<ClassFields<Domain>>, options?: ClassTransformOptions) {
+    protected plainToDomain(value: DomainConditionalOptional<ClassFields<Domain>, O>, options?: ClassTransformOptions) {
         return plainToInstance(this.domainConstructor, value, options);
     }
 
     // TODO Сделать исключения свойств которых нет в Entity
-    protected plainToEntity(value: Partial<ClassFields<Entity>>, options?: ClassTransformOptions) {
+    protected plainToEntity(value: EntityConditionalOptional<ClassFields<Entity>, O>, options?: ClassTransformOptions) {
         if (!this.entityConstructor) {
             throw new Error('EntityConstructor not found');
         }
@@ -162,7 +171,7 @@ export abstract class MapperBase<Dto, Domain, Entity = undefined> {
         );
     }
 
-    protected static instance: MapperBase<any, any, any>;
+    protected static instance: ConfigurableMapper<any, any, any, any>;
     static to<T>(this: new () => T): T {
         // @ts-ignore
         if (!this.instance) {
