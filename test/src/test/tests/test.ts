@@ -5,6 +5,8 @@ import {MapperSettings} from "../../../../source/src/mapper-settings";
 import {ProfileMapper} from "../../../../source/src/mapper/interfaces/profile-mapper.interface";
 
 class User {
+    constructor(toot: string, cit: number) {}
+
     text: string = "123";
     large: UserDto = {} as UserDto;
     method() {
@@ -23,6 +25,9 @@ export class UserProfile extends BaseMapperProfile {
         mapper.addRule(UserDto, User)
             .setToken("123")
             .autoMapPrimitive(false)
+            .callConstructor(() => {
+                return [];
+            })
             .complex(x => x.large, x => x.large)
 
         mapper.addRule(User, UserDto)

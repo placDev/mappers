@@ -12,3 +12,10 @@ export type NonPrimitiveKeys<T> = {
     [K in keyof T]: T[K] extends object ? K : never
 }[keyof T];
 export type NonPrimitive<T> = Pick<T, NonPrimitiveKeys<T>>;
+
+export type ConstructorArgs<T> = T extends new (...args: infer U) => any ? U : never;
+
+class Test {
+    constructor(vala: number) {
+    }
+}

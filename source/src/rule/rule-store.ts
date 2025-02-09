@@ -1,5 +1,5 @@
-import {ConstructorType} from "../utility-types";
-import {MapRule} from "./map-rule";
+import { ConstructorType } from "../utility-types";
+import { MapRule } from "./map-rule";
 
 export class RuleStore {
     private store = new Map<ConstructorType, Map<ConstructorType, MapRule<any, any>>>();

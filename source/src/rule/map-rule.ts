@@ -1,11 +1,23 @@
-import {Options} from "./options";
-import {ClassFields, ConstructorType, NonPrimitive} from "../utility-types";
+import { Options } from "./options";
+import {ClassFields, ConstructorArgs, ConstructorType, NonPrimitive} from "../utility-types";
+import {PropertiesRuleStore} from "./properties-rule-store";
 
 export class MapRule<From, To> {
+    propertiesStore = new PropertiesRuleStore();
+
+    private from: ConstructorType<From>;
+    private to: ConstructorType<To>;
+
     constructor(from: ConstructorType<From>, to: ConstructorType<To>) {
+        this.from = from;
+        this.to = to;
     }
 
     settings(value: Options) {
+        return this;
+    }
+
+    callConstructor(callConstructorCallback: () => To) {
         return this;
     }
 
@@ -21,6 +33,12 @@ export class MapRule<From, To> {
     property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => Promise<V>): MapRule<From, To>;
     property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => V): MapRule<From, To>;
     property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => Promise<V> | V) {
+        this.propertiesStore.addRule(
+            this.getPropertyName(propertyFrom),
+            this.getPropertyName(propertyTo),
+            transform
+        );
+
         return this;
     }
 
@@ -33,5 +51,16 @@ export class MapRule<From, To> {
 
     complexWithRule<Z, D>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => Z, propertyTo: (value: NonPrimitive<ClassFields<To>>) => D, rule: MapRule<Z, D>): MapRule<From, To> {
         return this;
+    }
+
+    private getPropertyName(propertyFunction: (value: any) => any): string {
+        const handler = {
+            get(target: any, prop: string | symbol) {
+                return prop;
+            }
+        };
+
+        const proxy = new Proxy({}, handler);
+        return propertyFunction(proxy);
     }
 }

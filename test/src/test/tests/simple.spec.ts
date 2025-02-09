@@ -1,6 +1,7 @@
 import {BaseMapperProfile} from "../../../../source/src/profile/base-mapper-profile";
 import {ProfileMapper} from "../../../../source/src/mapper/interfaces/profile-mapper.interface";
 import {MapperSettings} from "../../../../source/src/mapper-settings";
+import { plainToInstance } from 'class-transformer';
 
 class Simple {
   a: string = "";
@@ -10,6 +11,10 @@ class Simple {
 class SimpleDto {
   aDto: string = "";
   bDto: number = 0;
+}
+
+class Giga {
+  tot: string;
 }
 
 class AgaProfile extends BaseMapperProfile {
@@ -31,6 +36,7 @@ describe('...', () => {
   });
 
   it('.....', () => {
+    const fggh = "tot" in new Giga();
     const mapper = MapperSettings.getMapper();
 
     const simple = new Simple();
