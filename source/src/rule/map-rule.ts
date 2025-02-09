@@ -1,5 +1,12 @@
 import { Options } from "./options";
-import {ClassFields, ConstructorArgs, ConstructorType, NonPrimitive} from "../utility-types";
+import {
+    CallConstructorCallback,
+    CallConstructorCallbackAsync,
+    ClassFields,
+    ConstructorArgs,
+    ConstructorType,
+    NonPrimitive
+} from "../utility-types";
 import {PropertiesRuleStore} from "./properties-rule-store";
 
 export class MapRule<From, To> {
@@ -16,8 +23,10 @@ export class MapRule<From, To> {
     settings(value: Options) {
         return this;
     }
-
-    callConstructor(callConstructorCallback: () => To) {
+    
+    callToConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor>): MapRule<From, To>;
+    callToConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallbackAsync<ToConstructor>): MapRule<From, To>;
+    callToConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor> | CallConstructorCallbackAsync<ToConstructor>) {
         return this;
     }
 

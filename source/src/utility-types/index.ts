@@ -15,7 +15,5 @@ export type NonPrimitive<T> = Pick<T, NonPrimitiveKeys<T>>;
 
 export type ConstructorArgs<T> = T extends new (...args: infer U) => any ? U : never;
 
-class Test {
-    constructor(vala: number) {
-    }
-}
+export type CallConstructorCallback<ToConstructor> = (call: (...arg: ConstructorArgs<ToConstructor>) => void) => void
+export type CallConstructorCallbackAsync<ToConstructor> = (call: (...arg: ConstructorArgs<ToConstructor>) => void) => Promise<void>
