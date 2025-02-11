@@ -9,7 +9,7 @@ export class PropertyRule {
         this.transform = transform;
     }
 
-    public get isSimple() {
-        return this.transform === undefined;
+    public get isExistTransform() {
+        return this.transform !== undefined;
     }
 }

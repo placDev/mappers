@@ -3,7 +3,6 @@ import {
     CallConstructorCallback,
     CallConstructorCallbackAsync,
     ClassFields,
-    ConstructorArgs,
     ConstructorType,
     NonPrimitive
 } from "../utility-types";
@@ -24,9 +23,9 @@ export class MapRule<From, To> {
         return this;
     }
     
-    callToConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor>): MapRule<From, To>;
-    callToConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallbackAsync<ToConstructor>): MapRule<From, To>;
-    callToConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor> | CallConstructorCallbackAsync<ToConstructor>) {
+    callConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor>): MapRule<From, To>;
+    callConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallbackAsync<ToConstructor>): MapRule<From, To>;
+    callConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor> | CallConstructorCallbackAsync<ToConstructor>) {
         return this;
     }
 
@@ -60,6 +59,10 @@ export class MapRule<From, To> {
 
     complexWithRule<Z, D>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => Z, propertyTo: (value: NonPrimitive<ClassFields<To>>) => D, rule: MapRule<Z, D>): MapRule<From, To> {
         return this;
+    }
+
+    get toConstructor() {
+        return this.to;
     }
 
     private getPropertyName(propertyFunction: (value: any) => any): string {

@@ -1,4 +1,4 @@
-import {PropertyRule} from "./property-rule";
+import { PropertyRule } from "./property-rule";
 
 export class PropertiesRuleStore {
     private store = new Map<string, Map<string, PropertyRule>>();
@@ -15,6 +15,10 @@ export class PropertiesRuleStore {
         fromState.set(propertyTo, newRule);
 
         return newRule;
+    }
+
+    getPropertyRules(): Array<PropertyRule> {
+        return [...this.store.values()].flatMap(x => [...x.values()])
     }
 
     getRule(propertyFrom: string, propertyTo: string) {

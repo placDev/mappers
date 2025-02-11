@@ -25,7 +25,7 @@ export class UserProfile extends BaseMapperProfile {
         mapper.addRule(UserDto, User)
             .setToken("123")
             .autoMapPrimitive(false)
-            .callToConstructor(User, (call) => {
+            .callConstructor(User, (call) => {
                 call("", 123)
             })
             .complex(x => x.large, x => x.large)

@@ -2,6 +2,7 @@ import { RuleStore } from "../rule/rule-store";
 import {ConstructorType} from "../utility-types";
 import {ProfileMapper} from "./interfaces/profile-mapper.interface";
 import {MapRule} from "../rule/map-rule";
+import {plainToInstance} from "class-transformer";
 
 export class Mapper implements ProfileMapper {
     private store = new RuleStore();
@@ -14,16 +15,34 @@ export class Mapper implements ProfileMapper {
         return this.store.getRule(from, to);
     }
 
-    map<V extends F, F, T>(values: V[], from: ConstructorType<F>, to: ConstructorType<T>): T[]
-    map<V extends F, F, T>(values: V, from: ConstructorType<F>, to: ConstructorType<T>): T
-    map<V extends F, F, T>(values: V | V[], from: ConstructorType<F>, to: ConstructorType<T>): T | T[] {
+    map<V extends F, F, T>(values: V[], from: ConstructorType<F>, to: ConstructorType<T>): Promise<T[]>
+    map<V extends F, F, T>(values: V, from: ConstructorType<F>, to: ConstructorType<T>): Promise<T>
+    map<V extends F, F, T>(values: V | V[], from: ConstructorType<F>, to: ConstructorType<T>): Promise<T> | Promise<T[]> {
         const rule = this.getRule(from, to);
-        return !Array.isArray(values) ? this.mapSingle(rule, values) : values.map(value => this.mapSingle(rule, value));
+        return !Array.isArray(values) ? this.mapSingle(rule, values) : Promise.all(values.map(value => this.mapSingle(rule, value)));
     }
 
-    private mapSingle<F, T, V extends F>(rule: MapRule<F, T>, value: V) {
+    private async mapSingle<F, T, V extends F>(rule: MapRule<F, T>, value: V) {
+        const raw = plainToInstance(rule.toConstructor, {})
+
+        for(let propertyRule of rule.propertiesStore.getPropertyRules()) {
+            if(propertyRule.isExistTransform) {
+                // @ts-ignore
+                const propertyValue = value[propertyRule.propertyFrom];
+                const fromValue = value;
+                const toValue = raw;
+                // @ts-ignore
+                raw[propertyRule.propertyTo] = await propertyRule.transform(propertyValue, fromValue, toValue);
+                continue;
+            }
+
+            // @ts-ignore
+            raw[propertyRule.propertyTo] = value[propertyRule.propertyFrom];
+        }
+
+
         //plainToInstance(Person, plainPerson, { excludeExtraneousValues: true })
         // TODO Реализовать маппинг по правилу
-        return {} as T;
+        return raw as T;
     }
 }

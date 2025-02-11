@@ -1,16 +1,17 @@
 import {BaseMapperProfile} from "../../../../source/src/profile/base-mapper-profile";
 import {ProfileMapper} from "../../../../source/src/mapper/interfaces/profile-mapper.interface";
 import {MapperSettings} from "../../../../source/src/mapper-settings";
-import { plainToInstance } from 'class-transformer';
 
 class Simple {
   a: string = "";
   b: number = 0;
+  z: string = "Пука"
 }
 
 class SimpleDto {
   aDto: string = "";
   bDto: number = 0;
+  zDto: number = 0;
 }
 
 class Giga {
@@ -22,6 +23,13 @@ class AgaProfile extends BaseMapperProfile {
     mapper.addRule(Simple, SimpleDto)
         .property(x => x.a, x => x.aDto)
         .property(x => x.b, x => x.bDto)
+        .property(x => x.z, x => x.zDto, async (propertyValue, fromValue, toValue) => {
+          const pV = propertyValue;
+          const fV = fromValue;
+          const tV = toValue;
+
+          return 666;
+        })
 
     mapper.addRule(SimpleDto, Simple)
         .property(x => x.aDto, x => x.a)
@@ -35,11 +43,14 @@ describe('...', () => {
     MapperSettings.collectRules();
   });
 
-  it('.....', () => {
+  it('.....', async () => {
     const fggh = "tot" in new Giga();
     const mapper = MapperSettings.getMapper();
 
     const simple = new Simple();
-    const t = mapper.map(simple, Simple, SimpleDto);
+    simple.a = "good";
+    simple.b = 100500;
+
+    const t = await mapper.map(simple, Simple, SimpleDto);
   });
 });
