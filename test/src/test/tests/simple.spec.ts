@@ -23,10 +23,10 @@ class AgaProfile extends BaseMapperProfile {
     mapper.addRule(Simple, SimpleDto)
         .property(x => x.a, x => x.aDto)
         .property(x => x.b, x => x.bDto)
-        .property(x => x.z, x => x.zDto, async (propertyValue, fromValue, toValue) => {
-          const pV = propertyValue;
-          const fV = fromValue;
-          const tV = toValue;
+        .property(x => x.z, x => x.zDto, async (property, from, to) => {
+          const pV = property;
+          const fV = from;
+          const tV = to;
 
           return 666;
         })
@@ -52,5 +52,8 @@ describe('...', () => {
     simple.b = 100500;
 
     const t = await mapper.map(simple, Simple, SimpleDto);
+    const f = await mapper.map([simple], Simple, SimpleDto);
+
+    const fd = await mapper.defineMap(simple, SimpleDto);
   });
 });

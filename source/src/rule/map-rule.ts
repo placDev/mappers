@@ -38,9 +38,9 @@ export class MapRule<From, To> {
     }
 
     property<C>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => C): MapRule<From, To>;
-    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => Promise<V>): MapRule<From, To>;
-    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => V): MapRule<From, To>;
-    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => Promise<V> | V) {
+    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => Promise<V>): MapRule<From, To>;
+    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => V): MapRule<From, To>;
+    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => Promise<V> | V) {
         this.propertiesStore.addRule(
             this.getPropertyName(propertyFrom),
             this.getPropertyName(propertyTo),
@@ -51,9 +51,9 @@ export class MapRule<From, To> {
     }
 
     complex<C, V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: NonPrimitive<ClassFields<To>>) => C): MapRule<From, To>;
-    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => Promise<N>): MapRule<From, To>;
-    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => N): MapRule<From, To>;
-    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (propertyValue: C, fromValue: From, toValue: To) => Promise<N> | N) {
+    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => Promise<N>): MapRule<From, To>;
+    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => N): MapRule<From, To>;
+    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => Promise<N> | N) {
         return this;
     }
 

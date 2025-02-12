@@ -22,6 +22,13 @@ export class Mapper implements ProfileMapper {
         return !Array.isArray(values) ? this.mapSingle(rule, values) : Promise.all(values.map(value => this.mapSingle(rule, value)));
     }
 
+    defineMap<V extends Object, T>(values: V[], to: ConstructorType<T>): Promise<T[]>
+    defineMap<V extends Object, T>(values: V, to: ConstructorType<T>): Promise<T>
+    defineMap<V extends Object, T>(values: V | V[], to: ConstructorType<T>): Promise<T> | Promise<T[]> {
+        // TODO Допилить
+        return {} as Promise<T[]>;
+    }
+
     private async mapSingle<F, T, V extends F>(rule: MapRule<F, T>, value: V) {
         const raw = plainToInstance(rule.toConstructor, {})
 
