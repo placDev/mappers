@@ -24,7 +24,7 @@ export class UserProfile extends BaseMapperProfile {
     async define(mapper: ProfileMapper) {
         mapper.addRule(UserDto, User)
             .setToken("123")
-            .autoMapPrimitive(false)
+            .autoMapPrimitive()
             .callConstructor(User, (call) => {
                 call("", 123)
             })
@@ -38,7 +38,7 @@ export class UserProfile extends BaseMapperProfile {
             .complex((x) => x.large, (c) => c.large, (gavno) => {
                 return new User();
             })
-            .complexWithRule((x) => x.large, (c) => c.large, mapper.getRule(UserDto, User))
+            .withRule((x) => x.large, (c) => c.large, mapper.getRule(UserDto, User))
     }
 }
 
