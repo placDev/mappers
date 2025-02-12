@@ -55,5 +55,7 @@ describe('...', () => {
     const f = await mapper.map([simple], Simple, SimpleDto);
 
     const fd = await mapper.defineMap(simple, SimpleDto);
+    const fddd = await mapper.defineMap([simple], SimpleDto);
+    const fddfd = await mapper.defineMap([{}], SimpleDto);
   });
 });

@@ -25,8 +25,19 @@ export class Mapper implements ProfileMapper {
     defineMap<V extends Object, T>(values: V[], to: ConstructorType<T>): Promise<T[]>
     defineMap<V extends Object, T>(values: V, to: ConstructorType<T>): Promise<T>
     defineMap<V extends Object, T>(values: V | V[], to: ConstructorType<T>): Promise<T> | Promise<T[]> {
-        // TODO Допилить
-        return {} as Promise<T[]>;
+        const isArray = Array.isArray(values);
+
+        if(isArray && !values.length) {
+            return new Promise<T[]>((resolve, reject) => resolve([]));
+        }
+
+        const constructor = isArray ? values[0].constructor : values.constructor;
+        if(constructor === Object) {
+            throw Error("Объект не является классом");
+        }
+
+        // @ts-ignore
+        return this.map(values, constructor, to);
     }
 
     private async mapSingle<F, T, V extends F>(rule: MapRule<F, T>, value: V) {
@@ -35,11 +46,7 @@ export class Mapper implements ProfileMapper {
         for(let propertyRule of rule.propertiesStore.getPropertyRules()) {
             if(propertyRule.isExistTransform) {
                 // @ts-ignore
-                const propertyValue = value[propertyRule.propertyFrom];
-                const fromValue = value;
-                const toValue = raw;
-                // @ts-ignore
-                raw[propertyRule.propertyTo] = await propertyRule.transform(propertyValue, fromValue, toValue);
+                raw[propertyRule.propertyTo] = await propertyRule.transform(value[propertyRule.propertyFrom], value, raw);
                 continue;
             }
 
