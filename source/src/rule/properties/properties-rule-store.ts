@@ -3,6 +3,10 @@ import { PropertyRule } from "./property-rule";
 export class PropertiesRuleStore {
     private store = new Map<string, Map<string, PropertyRule>>();
 
+    isEmpty() {
+        return this.store.size == 0;
+    }
+
     addRule(propertyFrom: string, propertyTo: string, transform?: (...arg: any[]) => any) {
         this.initialFromState(propertyFrom);
 

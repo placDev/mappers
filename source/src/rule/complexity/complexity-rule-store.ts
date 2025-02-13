@@ -1,10 +1,15 @@
 import {ComplexRule} from "./complex-rule";
 import {MapRule} from "../map-rule";
+import {ProxyRule} from "../proxy-rule";
 
 export class ComplexityRuleStore {
     private store = new Map<string, Map<string, ComplexRule>>();
 
-    addRule(propertyFrom: string, propertyTo: string, transform?: (...arg: any[]) => any, rule?: MapRule<any, any>) {
+    isEmpty() {
+        return this.store.size == 0;
+    }
+
+    addRule(propertyFrom: string, propertyTo: string, transform?: (...arg: any[]) => any, rule?: ProxyRule<any, any>) {
         this.initialFromState(propertyFrom);
 
         let fromState = this.store.get(propertyFrom) as Map<string, ComplexRule>;

@@ -28,7 +28,7 @@ export class UserProfile extends BaseMapperProfile {
             .callConstructor(User, (call) => {
                 call("", 123)
             })
-            .complex(x => x.large, x => x.large)
+            .complex(x => x.large, x => x.large);
 
         mapper.addRule(User, UserDto)
             .property((x) => x.text, (c) => c.text3)
@@ -38,7 +38,8 @@ export class UserProfile extends BaseMapperProfile {
             .complex((x) => x.large, (c) => c.large, (gavno) => {
                 return new User();
             })
-            .withRule((x) => x.large, (c) => c.large, mapper.getRule(UserDto, User))
+            .byRule((x) => x.large, (c) => c.large, mapper.withRule(UserDto, User))
+            .validate()
     }
 }
 

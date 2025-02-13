@@ -6,6 +6,7 @@ import {plainToInstance} from "class-transformer";
 import {PropertyRule} from "../rule/properties/property-rule";
 import {ComplexRule} from "../rule/complexity/complex-rule";
 import {Cloner} from "../utils/cloner";
+import {ProxyRule} from "../rule/proxy-rule";
 
 export class Mapper implements ProfileMapper {
     private store = new RuleStore();
@@ -14,6 +15,11 @@ export class Mapper implements ProfileMapper {
         return this.store.addRule(from, to);
     }
 
+    withRule<F, T>(from: ConstructorType<F>, to: ConstructorType<T>) {
+        return new ProxyRule(from, to);
+    }
+
+    // TODO А нужен ли
     getRule<F, T>(from: ConstructorType<F>, to: ConstructorType<T>) {
         return this.store.getRule(from, to);
     }
@@ -44,8 +50,13 @@ export class Mapper implements ProfileMapper {
         //plainToInstance(Person, plainPerson, { excludeExtraneousValues: true })
         const raw = plainToInstance(rule.toConstructor, {})
 
-        await this.fillProperties(raw, rule.propertiesStore.getPropertyRules(), value);
-        await this.fillComplexity(raw, rule.complexityStore.getComplexRules(), value);
+        if(!rule.propertiesStore.isEmpty()) {
+            await this.fillProperties(raw, rule.propertiesStore.getPropertyRules(), value);
+        }
+
+        if(!rule.complexityStore.isEmpty()) {
+            await this.fillComplexity(raw, rule.complexityStore.getComplexRules(), value);
+        }
 
         return raw as T;
     }
@@ -71,12 +82,17 @@ export class Mapper implements ProfileMapper {
 
     private async fillComplexity(raw: any, complexRules: ComplexRule[], value: any) {
         for(let complexRule of complexRules) {
-            // TODO Реализовать для правила и трансформа
-            // if(complexRule.isExistTransform) {
-            //     // @ts-ignore
-            //     raw[propertyRule.propertyTo] = await propertyRule.transform(value[propertyRule.propertyFrom], value, raw);
-            //     continue;
-            // }
+            // Если свойство объекта является объектом по прототипу - перепроверить что из трансформа возвращается объект с прототипом
+            if(complexRule.isExistTransform) {
+                raw[complexRule.propertyTo] = await complexRule.transform!(value[complexRule.propertyFrom], value, raw);
+                continue;
+            }
+
+            if(complexRule.isExistRule) {
+                const rule = this.store.getRule(complexRule.rule!.getFrom(), complexRule.rule!.getTo())
+                raw[complexRule.propertyTo] = await this.mapSingle(rule, value[complexRule.propertyFrom]);
+                continue;
+            }
 
             // @ts-ignore
             raw[complexRule.propertyTo] = Cloner.deep(value[complexRule.propertyFrom]);

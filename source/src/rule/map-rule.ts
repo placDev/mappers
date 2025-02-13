@@ -8,14 +8,18 @@ import {
 } from "../utility-types";
 import {PropertiesRuleStore} from "./properties/properties-rule-store";
 import {ComplexityRuleStore} from "./complexity/complexity-rule-store";
+import {ProxyRule} from "./proxy-rule";
 
 export class MapRule<From, To> {
     propertiesStore = new PropertiesRuleStore();
     complexityStore = new ComplexityRuleStore();
 
-
     private from: ConstructorType<From>;
     private to: ConstructorType<To>;
+
+    get toConstructor() {
+        return this.to;
+    }
 
     constructor(from: ConstructorType<From>, to: ConstructorType<To>) {
         this.from = from;
@@ -66,7 +70,7 @@ export class MapRule<From, To> {
         return this;
     }
 
-    withRule<Z, D>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => Z, propertyTo: (value: NonPrimitive<ClassFields<To>>) => D, rule: MapRule<Z, D>): MapRule<From, To> {
+    byRule<Z, D>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => Z, propertyTo: (value: NonPrimitive<ClassFields<To>>) => D, rule: ProxyRule<Z, D>): MapRule<From, To> {
         this.complexityStore.addRule(
             this.getPropertyName(propertyFrom),
             this.getPropertyName(propertyTo),
@@ -77,8 +81,8 @@ export class MapRule<From, To> {
         return this;
     }
 
-    get toConstructor() {
-        return this.to;
+    validate() {
+        return this;
     }
 
     private getPropertyName(propertyFunction: (value: any) => any): string {
