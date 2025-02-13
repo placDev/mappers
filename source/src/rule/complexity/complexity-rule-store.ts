@@ -1,26 +1,28 @@
-import { PropertyRule } from "./property-rule";
+import {ComplexRule} from "./complex-rule";
+import {MapRule} from "../map-rule";
 
-export class PropertiesRuleStore {
-    private store = new Map<string, Map<string, PropertyRule>>();
+export class ComplexityRuleStore {
+    private store = new Map<string, Map<string, ComplexRule>>();
 
-    addRule(propertyFrom: string, propertyTo: string, transform?: (...arg: any[]) => any) {
+    addRule(propertyFrom: string, propertyTo: string, transform?: (...arg: any[]) => any, rule?: MapRule<any, any>) {
         this.initialFromState(propertyFrom);
 
-        let fromState = this.store.get(propertyFrom) as Map<string, PropertyRule>;
+        let fromState = this.store.get(propertyFrom) as Map<string, ComplexRule>;
         if(fromState.has(propertyTo)) {
             throw new Error("Данное правило для свойства уже добавленно в маппер")
         }
 
-        const newRule = new PropertyRule(propertyFrom, propertyTo, transform);
+        const newRule = new ComplexRule(propertyFrom, propertyTo, transform, rule);
         fromState.set(propertyTo, newRule);
 
         return newRule;
     }
 
-    getPropertyRules(): Array<PropertyRule> {
+    getComplexRules(): Array<ComplexRule> {
         return [...this.store.values()].flatMap(x => [...x.values()])
     }
 
+    //TODO Не нужен
     getRule(propertyFrom: string, propertyTo: string) {
         const fromState = this.store.get(propertyFrom);
         if(!fromState) {
@@ -31,12 +33,12 @@ export class PropertiesRuleStore {
             throw new Error(`Правило для ${propertyFrom} и ${propertyTo} не найдено`)
         }
 
-        return fromState.get(propertyTo) as PropertyRule;
+        return fromState.get(propertyTo) as ComplexRule;
     }
 
     private initialFromState(propertyFrom: string) {
         if(!this.store.has(propertyFrom)) {
-            this.store.set(propertyFrom, new Map<string, PropertyRule>());
+            this.store.set(propertyFrom, new Map<string, ComplexRule>());
         }
     }
 }

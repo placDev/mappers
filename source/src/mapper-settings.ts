@@ -6,7 +6,7 @@ import {BaseMapperProfile} from "./profile/base-mapper-profile";
 export class MapperSettings {
     private constructor() {}
 
-    private static mapper: Mapper = new Mapper();
+    private static mapper = new Mapper();
     private static profiles = new ProfileStore();
 
     static addProfile(constructor: ConstructorType<BaseMapperProfile>) {

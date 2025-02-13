@@ -1,21 +1,20 @@
 import {BaseMapperProfile} from "../../../../source/src/profile/base-mapper-profile";
 import {ProfileMapper} from "../../../../source/src/mapper/interfaces/profile-mapper.interface";
 import {MapperSettings} from "../../../../source/src/mapper-settings";
+import {Mapper} from "../../../../source/src/mapper/mapper";
 
 class Simple {
   a: string = "";
   b: number = 0;
   z: string = "Пука"
+  v: boolean;
 }
 
 class SimpleDto {
   aDto: string = "";
   bDto: number = 0;
   zDto: number = 0;
-}
-
-class Giga {
-  tot: string;
+  v: boolean = false;
 }
 
 class AgaProfile extends BaseMapperProfile {
@@ -30,32 +29,93 @@ class AgaProfile extends BaseMapperProfile {
 
           return 666;
         })
+        .property((x) => x.v, (x) => x.v, () => {
+          return true
+        })
 
     mapper.addRule(SimpleDto, Simple)
-        .property(x => x.aDto, x => x.a)
+        .property(x => x.aDto, x => x.a, () => "Martin")
         .property(x => x.bDto, x => x.b)
   }
 }
 
 describe('...', () => {
+  let mapper: Mapper;
+
   beforeEach(async () => {
     MapperSettings.addProfile(AgaProfile);
     MapperSettings.collectRules();
+
+    mapper = MapperSettings.getMapper();
   });
 
   it('.....', async () => {
-    const fggh = "tot" in new Giga();
+    const simple = new Simple();
+    simple.a = "good";
+    simple.b = 100500;
+
+    const single = await mapper.map(simple, Simple, SimpleDto);
+    expect(single).toBeInstanceOf(SimpleDto);
+    expect(single).toEqual(expect.objectContaining<Partial<SimpleDto>>({
+      bDto: 100500,
+      zDto: 666,
+      v: true,
+    }));
+
+    const array = await mapper.map([simple], Simple, SimpleDto);
+    expect(array).toHaveLength(1);
+
+    const [first] = array;
+    expect(first).toBeInstanceOf(SimpleDto);
+    expect(first).toEqual(expect.objectContaining<Partial<SimpleDto>>({
+      bDto: 100500,
+      zDto: 666,
+      v: true,
+    }));
+  });
+
+  it('test automap', async () => {
+    const simple = new Simple();
+    simple.a = "good";
+    simple.b = 100500;
+
+    const single = await mapper.autoMap(simple, SimpleDto);
+    expect(single).toBeInstanceOf(SimpleDto);
+    expect(single).toEqual(expect.objectContaining<Partial<SimpleDto>>({
+      bDto: 100500,
+      zDto: 666,
+      v: true,
+    }));
+
+
+    const array = await mapper.autoMap([simple], SimpleDto);
+    expect(array).toHaveLength(1);
+
+    const [first] = array;
+    expect(first).toBeInstanceOf(SimpleDto);
+    expect(first).toEqual(expect.objectContaining<Partial<SimpleDto>>({
+      bDto: 100500,
+      zDto: 666,
+      v: true,
+    }));
+  });
+
+  it('should throw error', async () => {
     const mapper = MapperSettings.getMapper();
 
     const simple = new Simple();
     simple.a = "good";
     simple.b = 100500;
 
-    const t = await mapper.map(simple, Simple, SimpleDto);
-    const f = await mapper.map([simple], Simple, SimpleDto);
+    await expect(async () => { await mapper.autoMap([simple, {}], SimpleDto) }).rejects.toThrowError(Error);
+    await expect(async () => { await mapper.autoMap([{}], SimpleDto) }).rejects.toThrowError(Error);
+  })
 
-    const fd = await mapper.defineMap(simple, SimpleDto);
-    const fddd = await mapper.defineMap([simple], SimpleDto);
-    const fddfd = await mapper.defineMap([{}], SimpleDto);
-  });
+  it('revers', async () => {
+    const simpleDto = await mapper.map(new Simple(), Simple, SimpleDto);
+    const simple = await mapper.map(simpleDto, SimpleDto, Simple);
+
+    expect(simple).toBeInstanceOf(Simple);
+    expect(simple.a).toEqual("Martin");
+  })
 });

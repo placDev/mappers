@@ -3,6 +3,9 @@ import {ConstructorType} from "../utility-types";
 import {ProfileMapper} from "./interfaces/profile-mapper.interface";
 import {MapRule} from "../rule/map-rule";
 import {plainToInstance} from "class-transformer";
+import {PropertyRule} from "../rule/properties/property-rule";
+import {ComplexRule} from "../rule/complexity/complex-rule";
+import {Cloner} from "../utils/cloner";
 
 export class Mapper implements ProfileMapper {
     private store = new RuleStore();
@@ -22,28 +25,39 @@ export class Mapper implements ProfileMapper {
         return !Array.isArray(values) ? this.mapSingle(rule, values) : Promise.all(values.map(value => this.mapSingle(rule, value)));
     }
 
-    defineMap<V extends Object, T>(values: V[], to: ConstructorType<T>): Promise<T[]>
-    defineMap<V extends Object, T>(values: V, to: ConstructorType<T>): Promise<T>
-    defineMap<V extends Object, T>(values: V | V[], to: ConstructorType<T>): Promise<T> | Promise<T[]> {
-        const isArray = Array.isArray(values);
-
-        if(isArray && !values.length) {
+    autoMap<V extends Object, T>(values: V[], to: ConstructorType<T>): Promise<T[]>
+    autoMap<V extends Object, T>(values: V, to: ConstructorType<T>): Promise<T>
+    autoMap<V extends Object, T>(values: V | V[], to: ConstructorType<T>): Promise<T> | Promise<T[]> {
+        if(Array.isArray(values) && !values.length) {
             return new Promise<T[]>((resolve, reject) => resolve([]));
         }
 
-        const constructor = isArray ? values[0].constructor : values.constructor;
-        if(constructor === Object) {
-            throw Error("Объект не является классом");
-        }
+        this.checkObjectsIsNotAnonymous(values);
 
+        // @ts-ignore
+        const constructor = Array.isArray(values) ? values[0].constructor : values.constructor;
         // @ts-ignore
         return this.map(values, constructor, to);
     }
 
     private async mapSingle<F, T, V extends F>(rule: MapRule<F, T>, value: V) {
+        //plainToInstance(Person, plainPerson, { excludeExtraneousValues: true })
         const raw = plainToInstance(rule.toConstructor, {})
 
-        for(let propertyRule of rule.propertiesStore.getPropertyRules()) {
+        await this.fillProperties(raw, rule.propertiesStore.getPropertyRules(), value);
+        await this.fillComplexity(raw, rule.complexityStore.getComplexRules(), value);
+
+        return raw as T;
+    }
+
+    private checkObjectsIsNotAnonymous<V extends Object>(values: V | V[]) {
+        if(Array.isArray(values) ? values.some(x => x.constructor === Object) : values.constructor === Object) {
+            throw Error("Объект не является классом");
+        }
+    }
+
+    private async fillProperties(raw: any, propertyRules: PropertyRule[], value: any) {
+        for(let propertyRule of propertyRules) {
             if(propertyRule.isExistTransform) {
                 // @ts-ignore
                 raw[propertyRule.propertyTo] = await propertyRule.transform(value[propertyRule.propertyFrom], value, raw);
@@ -53,10 +67,19 @@ export class Mapper implements ProfileMapper {
             // @ts-ignore
             raw[propertyRule.propertyTo] = value[propertyRule.propertyFrom];
         }
+    }
 
+    private async fillComplexity(raw: any, complexRules: ComplexRule[], value: any) {
+        for(let complexRule of complexRules) {
+            // TODO Реализовать для правила и трансформа
+            // if(complexRule.isExistTransform) {
+            //     // @ts-ignore
+            //     raw[propertyRule.propertyTo] = await propertyRule.transform(value[propertyRule.propertyFrom], value, raw);
+            //     continue;
+            // }
 
-        //plainToInstance(Person, plainPerson, { excludeExtraneousValues: true })
-        // TODO Реализовать маппинг по правилу
-        return raw as T;
+            // @ts-ignore
+            raw[complexRule.propertyTo] = Cloner.deep(value[complexRule.propertyFrom]);
+        }
     }
 }
