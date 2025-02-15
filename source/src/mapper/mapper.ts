@@ -47,8 +47,7 @@ export class Mapper implements ProfileMapper {
     }
 
     private async mapSingle<F, T, V extends F>(rule: MapRule<F, T>, value: V) {
-        //plainToInstance(Person, plainPerson, { excludeExtraneousValues: true })
-        const raw = plainToInstance(rule.toConstructor, {})
+        const raw = await this.createInstance(rule, value);
 
         if(!rule.propertiesStore.isEmpty()) {
             await this.fillProperties(raw, rule.propertiesStore.getPropertyRules(), value);
@@ -67,6 +66,15 @@ export class Mapper implements ProfileMapper {
         }
     }
 
+    private async createInstance<F, T, V extends F>(rule: MapRule<F, T>, value: V) {
+        //plainToInstance(Person, plainPerson, { excludeExtraneousValues: true })
+        if(rule.constructorRule.isEnabled()) {
+            return await rule.constructorRule.invokeCreateFunction(value);
+        }
+
+        return plainToInstance(rule.toConstructor, {});
+    }
+
     private async fillProperties(raw: any, propertyRules: PropertyRule[], value: any) {
         for(let propertyRule of propertyRules) {
             if(propertyRule.isExistTransform) {
@@ -82,6 +90,7 @@ export class Mapper implements ProfileMapper {
 
     private async fillComplexity(raw: any, complexRules: ComplexRule[], value: any) {
         for(let complexRule of complexRules) {
+            //TODO
             // Если свойство объекта является объектом по прототипу - перепроверить что из трансформа возвращается объект с прототипом
             if(complexRule.isExistTransform) {
                 raw[complexRule.propertyTo] = await complexRule.transform!(value[complexRule.propertyFrom], value, raw);

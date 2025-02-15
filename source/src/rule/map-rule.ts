@@ -1,7 +1,6 @@
 import { Options } from "./options";
 import {
     CallConstructorCallback,
-    CallConstructorCallbackAsync,
     ClassFields,
     ConstructorType,
     NonPrimitive
@@ -9,10 +8,12 @@ import {
 import {PropertiesRuleStore} from "./properties/properties-rule-store";
 import {ComplexityRuleStore} from "./complexity/complexity-rule-store";
 import {ProxyRule} from "./proxy-rule";
+import {ConstructorRule} from "./constructor/constructor-rule";
 
 export class MapRule<From, To> {
     propertiesStore = new PropertiesRuleStore();
     complexityStore = new ComplexityRuleStore();
+    constructorRule: ConstructorRule<To>;
 
     private from: ConstructorType<From>;
     private to: ConstructorType<To>;
@@ -24,15 +25,25 @@ export class MapRule<From, To> {
     constructor(from: ConstructorType<From>, to: ConstructorType<To>) {
         this.from = from;
         this.to = to;
+
+        this.constructorRule = new ConstructorRule(this.to);
     }
 
     settings(value: Options) {
         return this;
     }
-    
-    callConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor>): MapRule<From, To>;
-    callConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallbackAsync<ToConstructor>): MapRule<From, To>;
-    callConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor> | CallConstructorCallbackAsync<ToConstructor>) {
+
+    callConstructor(): MapRule<From, To>;
+    callConstructor<ToConstructor extends ConstructorType<To>>(toConstructor: ToConstructor, callConstructorCallback: CallConstructorCallback<ToConstructor, From>): MapRule<From, To>;
+    callConstructor<ToConstructor extends ConstructorType<To>>(toConstructor?: ToConstructor, callConstructorCallback?: CallConstructorCallback<ToConstructor, From>) {
+        this.constructorRule.setEnabled();
+
+        if(!toConstructor && !callConstructorCallback) {
+            return this;
+        }
+
+        this.constructorRule.setCreateFunction(callConstructorCallback!);
+
         return this;
     }
 

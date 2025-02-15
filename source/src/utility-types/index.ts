@@ -15,5 +15,4 @@ export type NonPrimitive<T> = Pick<T, NonPrimitiveKeys<T>>;
 
 export type ConstructorArgs<T> = T extends new (...args: infer U) => any ? U : never;
 
-export type CallConstructorCallback<ToConstructor> = (call: (...arg: ConstructorArgs<ToConstructor>) => void) => void
-export type CallConstructorCallbackAsync<ToConstructor> = (call: (...arg: ConstructorArgs<ToConstructor>) => void) => Promise<void>
+export type CallConstructorCallback<ToConstructor, From> = (call: (...arg: ConstructorArgs<ToConstructor>) => void, from?: From) => void | Promise<void>

@@ -1,7 +1,6 @@
 export class Cloner {
     private static cache = new WeakMap();
     static deep<T>(value: T) {
-        // Примитивы и null возвращаются как есть.
         if (value === null || typeof value !== 'object') {
             return value;
         }
@@ -72,13 +71,13 @@ export class Cloner {
         }
 
         // Копирование символов как ключей.
-        for (const sym of Object.getOwnPropertySymbols(value)) {
-            const descriptor = Object.getOwnPropertyDescriptor(value, sym);
+        for (const symbol of Object.getOwnPropertySymbols(value)) {
+            const descriptor = Object.getOwnPropertyDescriptor(value, symbol);
             if (descriptor) {
                 if ("value" in descriptor) {
-                    descriptor.value = this.deep((value as any)[sym]);
+                    descriptor.value = this.deep((value as any)[symbol]);
                 }
-                Object.defineProperty(clonedObj, sym, descriptor);
+                Object.defineProperty(clonedObj, symbol, descriptor);
             }
         }
 
