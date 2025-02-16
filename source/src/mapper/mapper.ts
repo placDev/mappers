@@ -7,6 +7,7 @@ import {PropertyRule} from "../rule/properties/property-rule";
 import {ComplexRule} from "../rule/complexity/complex-rule";
 import {Cloner} from "../utils/cloner";
 import {ProxyRule} from "../rule/proxy-rule";
+import {FillRule} from "../rule/fill/fill-rule";
 
 export class Mapper implements ProfileMapper {
     private store = new RuleStore();
@@ -57,6 +58,10 @@ export class Mapper implements ProfileMapper {
             await this.fillComplexity(raw, rule.complexityStore.getComplexRules(), value);
         }
 
+        if(!rule.fillStore.isEmpty()) {
+            await this.invokeFill(raw, rule.fillStore.getFillRules(), value);
+        }
+
         return raw as T;
     }
 
@@ -90,8 +95,6 @@ export class Mapper implements ProfileMapper {
 
     private async fillComplexity(raw: any, complexRules: ComplexRule[], value: any) {
         for(let complexRule of complexRules) {
-            //TODO
-            // Если свойство объекта является объектом по прототипу - перепроверить что из трансформа возвращается объект с прототипом
             if(complexRule.isExistTransform) {
                 raw[complexRule.propertyTo] = await complexRule.transform!(value[complexRule.propertyFrom], value, raw);
                 continue;
@@ -105,6 +108,13 @@ export class Mapper implements ProfileMapper {
 
             // @ts-ignore
             raw[complexRule.propertyTo] = Cloner.deep(value[complexRule.propertyFrom]);
+        }
+    }
+
+    private async invokeFill(raw: any, fillRules: FillRule[], value: any) {
+        for(let fillRule of fillRules) {
+            // @ts-ignore
+            raw[fillRule.propertyTo] = await fillRule.transform(value, raw);
         }
     }
 }

@@ -9,10 +9,14 @@ import {PropertiesRuleStore} from "./properties/properties-rule-store";
 import {ComplexityRuleStore} from "./complexity/complexity-rule-store";
 import {ProxyRule} from "./proxy-rule";
 import {ConstructorRule} from "./constructor/constructor-rule";
+import {FillRuleStore} from "./fill/fill-rule-store";
+import {BaseMapperValidator} from "../validator/base-mapper-validator";
 
 export class MapRule<From, To> {
     propertiesStore = new PropertiesRuleStore();
     complexityStore = new ComplexityRuleStore();
+    fillStore = new FillRuleStore();
+
     constructorRule: ConstructorRule<To>;
 
     private from: ConstructorType<From>;
@@ -48,9 +52,10 @@ export class MapRule<From, To> {
     }
 
     properties(intersectionCallback: (intersection: IntersectionProperties<ClassFields<From>, ClassFields<To>>) => IntersectionProperty[]): MapRule<From, To> {
-        const properties = this.getPropertyNames(intersectionCallback);
-        for (const property of properties) {
-            this.propertiesStore.addRule(property, property)
+        const propertyNames = this.getPropertyNames(intersectionCallback);
+        for (const name of propertyNames) {
+            this.propertiesStore.addRule(name, name);
+            this.addCacheToFillSore(name);
         }
 
         return this;
@@ -64,11 +69,14 @@ export class MapRule<From, To> {
     property<C, V>(propertyFrom: (value: Primitive<ClassFields<From>>) => C, propertyTo: (value: Primitive<ClassFields<To>>) => V, transform?: (property: C, from: From, to: To) => Promise<V>): MapRule<From, To>;
     property<C, V>(propertyFrom: (value: Primitive<ClassFields<From>>) => C, propertyTo: (value: Primitive<ClassFields<To>>) => V, transform?: (property: C, from: From, to: To) => V): MapRule<From, To>;
     property<C, V>(propertyFrom: (value: Primitive<ClassFields<From>>) => C, propertyTo: (value: Primitive<ClassFields<To>>) => V, transform?: (property: C, from: From, to: To) => Promise<V> | V) {
+        const propertyToName = this.getPropertyName(propertyTo);
         this.propertiesStore.addRule(
             this.getPropertyName(propertyFrom),
-            this.getPropertyName(propertyTo),
+            propertyToName,
             transform
         );
+
+        this.addCacheToFillSore(propertyToName);
 
         return this;
     }
@@ -77,8 +85,34 @@ export class MapRule<From, To> {
     complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: NonPrimitive<ClassFields<To>>) => V, transform: (property: C, from: From, to: To) => Promise<N>): MapRule<From, To>;
     complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: NonPrimitive<ClassFields<To>>) => V, transform: (property: C, from: From, to: To) => N): MapRule<From, To>;
     complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: NonPrimitive<ClassFields<To>>) => V, transform?: (property: C, from: From, to: To) => Promise<N> | N) {
+        const propertyToName = this.getPropertyName(propertyTo);
         this.complexityStore.addRule(
             this.getPropertyName(propertyFrom),
+            propertyToName,
+            transform
+        );
+
+        this.addCacheToFillSore(propertyToName);
+
+        return this;
+    }
+
+    byRule<Z, D>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => Z, propertyTo: (value: NonPrimitive<ClassFields<To>>) => D, rule: ProxyRule<Z, D>): MapRule<From, To> {
+        const propertyToName = this.getPropertyName(propertyTo);
+        this.complexityStore.addRule(
+            this.getPropertyName(propertyFrom),
+            propertyToName,
+            undefined,
+            rule
+        );
+
+        this.addCacheToFillSore(propertyToName);
+
+        return this;
+    }
+
+    fill<Z>(propertyTo: (value: ClassFields<To>) => Z, transform: (from: From, to: To) => Promise<Z> | Z) {
+        this.fillStore.addRule(
             this.getPropertyName(propertyTo),
             transform
         );
@@ -86,19 +120,12 @@ export class MapRule<From, To> {
         return this;
     }
 
-    byRule<Z, D>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => Z, propertyTo: (value: NonPrimitive<ClassFields<To>>) => D, rule: ProxyRule<Z, D>): MapRule<From, To> {
-        this.complexityStore.addRule(
-            this.getPropertyName(propertyFrom),
-            this.getPropertyName(propertyTo),
-            undefined,
-            rule
-        );
-
+    validate<T extends BaseMapperValidator>(validatorConstructor?: new () => T) {
         return this;
     }
 
-    validate() {
-        return this;
+    private addCacheToFillSore(propertyTo: string) {
+        this.fillStore.addToCache(propertyTo);
     }
 
     private getPropertyNames(propertyFunction: (value: any) => any): string[] {
