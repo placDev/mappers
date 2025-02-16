@@ -2,8 +2,8 @@ import { Options } from "./options";
 import {
     CallConstructorCallback,
     ClassFields,
-    ConstructorType,
-    NonPrimitive
+    ConstructorType, IntersectionProperties, IntersectionProperty,
+    NonPrimitive, Primitive
 } from "../utility-types";
 import {PropertiesRuleStore} from "./properties/properties-rule-store";
 import {ComplexityRuleStore} from "./complexity/complexity-rule-store";
@@ -47,7 +47,12 @@ export class MapRule<From, To> {
         return this;
     }
 
-    autoMapPrimitive(value: boolean = true): MapRule<From, To> {
+    properties(intersectionCallback: (intersection: IntersectionProperties<ClassFields<From>, ClassFields<To>>) => IntersectionProperty[]): MapRule<From, To> {
+        const properties = this.getPropertyNames(intersectionCallback);
+        for (const property of properties) {
+            this.propertiesStore.addRule(property, property)
+        }
+
         return this;
     }
 
@@ -55,10 +60,10 @@ export class MapRule<From, To> {
         return this;
     }
 
-    property<C>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => C): MapRule<From, To>;
-    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => Promise<V>): MapRule<From, To>;
-    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => V): MapRule<From, To>;
-    property<C, V>(propertyFrom: (value: ClassFields<From>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => Promise<V> | V) {
+    property<C>(propertyFrom: (value: Primitive<ClassFields<From>>) => C, propertyTo: (value: Primitive<ClassFields<To>>) => C): MapRule<From, To>;
+    property<C, V>(propertyFrom: (value: Primitive<ClassFields<From>>) => C, propertyTo: (value: Primitive<ClassFields<To>>) => V, transform?: (property: C, from: From, to: To) => Promise<V>): MapRule<From, To>;
+    property<C, V>(propertyFrom: (value: Primitive<ClassFields<From>>) => C, propertyTo: (value: Primitive<ClassFields<To>>) => V, transform?: (property: C, from: From, to: To) => V): MapRule<From, To>;
+    property<C, V>(propertyFrom: (value: Primitive<ClassFields<From>>) => C, propertyTo: (value: Primitive<ClassFields<To>>) => V, transform?: (property: C, from: From, to: To) => Promise<V> | V) {
         this.propertiesStore.addRule(
             this.getPropertyName(propertyFrom),
             this.getPropertyName(propertyTo),
@@ -69,9 +74,9 @@ export class MapRule<From, To> {
     }
 
     complex<C, V extends C>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: NonPrimitive<ClassFields<To>>) => V): MapRule<From, To>;
-    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform: (property: C, from: From, to: To) => Promise<N>): MapRule<From, To>;
-    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform: (property: C, from: From, to: To) => N): MapRule<From, To>;
-    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: ClassFields<To>) => V, transform?: (property: C, from: From, to: To) => Promise<N> | N) {
+    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: NonPrimitive<ClassFields<To>>) => V, transform: (property: C, from: From, to: To) => Promise<N>): MapRule<From, To>;
+    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: NonPrimitive<ClassFields<To>>) => V, transform: (property: C, from: From, to: To) => N): MapRule<From, To>;
+    complex<C, V, N extends V>(propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C, propertyTo: (value: NonPrimitive<ClassFields<To>>) => V, transform?: (property: C, from: From, to: To) => Promise<N> | N) {
         this.complexityStore.addRule(
             this.getPropertyName(propertyFrom),
             this.getPropertyName(propertyTo),
@@ -96,14 +101,21 @@ export class MapRule<From, To> {
         return this;
     }
 
+    private getPropertyNames(propertyFunction: (value: any) => any): string[] {
+        return propertyFunction(this.getProxyObjectForPropertyNames()) as string[];
+    }
+
     private getPropertyName(propertyFunction: (value: any) => any): string {
+        return propertyFunction(this.getProxyObjectForPropertyNames()) as string;
+    }
+
+    private getProxyObjectForPropertyNames() {
         const handler = {
             get(target: any, prop: string | symbol) {
                 return prop;
             }
         };
 
-        const proxy = new Proxy({}, handler);
-        return propertyFunction(proxy);
+        return new Proxy({}, handler);
     }
 }
