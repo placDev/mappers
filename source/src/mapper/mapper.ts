@@ -1,5 +1,5 @@
 import { RuleStore } from "../rule/rule-store";
-import {ConstructorType} from "../utility-types";
+import {ConstructorType, MapperValidatorType} from "../utility-types";
 import {ProfileMapper} from "./interfaces/profile-mapper.interface";
 import {MapRule} from "../rule/map-rule";
 import {plainToInstance} from "class-transformer";
@@ -29,7 +29,9 @@ export class Mapper implements ProfileMapper {
     map<V extends F, F, T>(values: V, from: ConstructorType<F>, to: ConstructorType<T>): Promise<T>
     map<V extends F, F, T>(values: V | V[], from: ConstructorType<F>, to: ConstructorType<T>): Promise<T> | Promise<T[]> {
         const rule = this.getRule(from, to);
-        return !Array.isArray(values) ? this.mapSingle(rule, values) : Promise.all(values.map(value => this.mapSingle(rule, value)));
+
+        const validatorInstance = this.getValidatorInstance(rule);
+        return !Array.isArray(values) ? this.mapSingle(rule, values, validatorInstance) : Promise.all(values.map(value => this.mapSingle(rule, value, validatorInstance)));
     }
 
     autoMap<V extends Object, T>(values: V[], to: ConstructorType<T>): Promise<T[]>
@@ -47,7 +49,7 @@ export class Mapper implements ProfileMapper {
         return this.map(values, constructor, to);
     }
 
-    private async mapSingle<F, T, V extends F>(rule: MapRule<F, T>, value: V) {
+    private async mapSingle<F, T, V extends F>(rule: MapRule<F, T>, value: V, validatorInstance?: MapperValidatorType<any, any>) {
         const raw = await this.createInstance(rule, value);
 
         if(!rule.propertiesStore.isEmpty()) {
@@ -60,6 +62,10 @@ export class Mapper implements ProfileMapper {
 
         if(!rule.fillStore.isEmpty()) {
             await this.invokeFill(raw, rule.fillStore.getFillRules(), value);
+        }
+
+        if(validatorInstance) {
+            await validatorInstance.validate(raw);
         }
 
         return raw as T;
@@ -101,8 +107,8 @@ export class Mapper implements ProfileMapper {
             }
 
             if(complexRule.isExistRule) {
-                const rule = this.store.getRule(complexRule.rule!.getFrom(), complexRule.rule!.getTo())
-                raw[complexRule.propertyTo] = await this.mapSingle(rule, value[complexRule.propertyFrom]);
+                const rule = this.store.getRule(complexRule.rule!.getFrom(), complexRule.rule!.getTo());
+                raw[complexRule.propertyTo] = await this.mapSingle(rule, value[complexRule.propertyFrom], this.getValidatorInstance(rule));
                 continue;
             }
 
@@ -116,5 +122,10 @@ export class Mapper implements ProfileMapper {
             // @ts-ignore
             raw[fillRule.propertyTo] = await fillRule.transform(value, raw);
         }
+    }
+
+    private getValidatorInstance(rule: MapRule<any, any>) {
+        const validatorRule = rule.validatorRule;
+        return validatorRule.getEnabled() ? validatorRule.getValidator() : undefined;
     }
 }

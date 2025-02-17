@@ -1,6 +1,6 @@
 import {BaseMapperProfile} from "../../../../source/src/profile/base-mapper-profile";
 import {ProfileMapper} from "../../../../source/src/mapper/interfaces/profile-mapper.interface";
-import {MapperSettings} from "../../../../source/src/mapper-settings";
+import {MapperSettings} from "../../../../source/src/settings/mapper-settings";
 import {Mapper} from "../../../../source/src/mapper/mapper";
 
 class Test {

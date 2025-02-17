@@ -3,14 +3,16 @@ import {
     CallConstructorCallback,
     ClassFields,
     ConstructorType, IntersectionProperties, IntersectionProperty,
-    NonPrimitive, Primitive
+    NonPrimitive, Primitive, MapperValidator
 } from "../utility-types";
 import {PropertiesRuleStore} from "./properties/properties-rule-store";
 import {ComplexityRuleStore} from "./complexity/complexity-rule-store";
 import {ProxyRule} from "./proxy-rule";
 import {ConstructorRule} from "./constructor/constructor-rule";
 import {FillRuleStore} from "./fill/fill-rule-store";
-import {BaseMapperValidator} from "../validator/base-mapper-validator";
+import {BaseMapperValidator} from "./validator/base-mapper-validator";
+import {ValidatorRule} from "./validator/validator-rule";
+import {MapperSettings} from "../settings/mapper-settings";
 
 export class MapRule<From, To> {
     propertiesStore = new PropertiesRuleStore();
@@ -18,6 +20,8 @@ export class MapRule<From, To> {
     fillStore = new FillRuleStore();
 
     constructorRule: ConstructorRule<To>;
+    // TODO It's worth taking it to a higher level and creating a cache of validators for all rules.
+    validatorRule = new ValidatorRule();
 
     private from: ConstructorType<From>;
     private to: ConstructorType<To>;
@@ -120,7 +124,16 @@ export class MapRule<From, To> {
         return this;
     }
 
-    validate<T extends BaseMapperValidator>(validatorConstructor?: new () => T) {
+    validate<T extends BaseMapperValidator>(validator?: MapperValidator<T, To>) {
+        if(validator === undefined && MapperSettings.getValidatorStore().isEmpty) {
+            throw new Error(`Не определен дефолтный валидатор или валидатор для правила ${this.from.name} и ${this.from.name}`);
+        }
+
+        this.validatorRule.setEnabled();
+        if(validator) {
+            this.validatorRule.setValidatorConstructor(validator);
+        }
+
         return this;
     }
 

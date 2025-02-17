@@ -1,7 +1,7 @@
 //TODO Уникальные ключи для правил что бы можно было несколько рулов пвеовешать
 /////
 import {BaseMapperProfile} from "../../../../source/src/profile/base-mapper-profile";
-import {MapperSettings} from "../../../../source/src/mapper-settings";
+import {MapperSettings} from "../../../../source/src/settings/mapper-settings";
 import {ProfileMapper} from "../../../../source/src/mapper/interfaces/profile-mapper.interface";
 
 class User {

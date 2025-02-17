@@ -1,11 +1,11 @@
 import {BaseMapperProfile} from "../../../../source/src/profile/base-mapper-profile";
 import {ProfileMapper} from "../../../../source/src/mapper/interfaces/profile-mapper.interface";
-import {MapperSettings} from "../../../../source/src/mapper-settings";
+import {MapperSettings} from "../../../../source/src/settings/mapper-settings";
 import {Mapper} from "../../../../source/src/mapper/mapper";
-import {BaseMapperValidator} from "../../../../source/src/validator/base-mapper-validator";
-import {TestMapperValidator} from "../validators/test-mapper-validator";
+import {BaseMapperValidator} from "../../../../source/src/rule/validator/base-mapper-validator";
+import {DefaultMapperValidator, TestMapperValidator} from "../validators/test-mapper-validator";
 
-class SimpleValidate {
+export class SimpleValidate {
     a: number = 100;
 }
 
@@ -19,7 +19,7 @@ class AgaProfile extends BaseMapperProfile {
             .property(x => x.a, x => x.aDto, (property) => {
                 return property.toString();
             })
-            .validate(TestMapperValidator)
+            .validate()
     }
 }
 
@@ -31,12 +31,14 @@ describe('...', () => {
     });
 
     it('.....', async () => {
+        MapperSettings.setDefaultValidator(DefaultMapperValidator);
         MapperSettings.collectRules();
+
         mapper = MapperSettings.getMapper();
 
-        const simple = new SimpleValidate();
+        const simpleMany = [new SimpleValidate(), new SimpleValidate()];
 
-        const result = await mapper.map(simple, SimpleValidate, SimpleValidateDto);
-        expect(result.aDto).toBe("100");
+        const [first] = await mapper.map(simpleMany, SimpleValidate, SimpleValidateDto);
+        expect(first.aDto).toBe("100");
     });
 });

@@ -1,8 +1,14 @@
 import { SimpleValidateDto } from "../tests/validate.spec";
-import { BaseMapperValidator } from "../../../../source/src/validator/base-mapper-validator";
+import { BaseMapperValidator } from "../../../../source/src/rule/validator/base-mapper-validator";
+
+export class DefaultMapperValidator extends BaseMapperValidator {
+    async validate(item: SimpleValidateDto) {
+        console.log("Default");
+    }
+}
 
 export class TestMapperValidator extends BaseMapperValidator {
-    validate(item: SimpleValidateDto): Promise<void> {
-        throw new Error("Method not implemented.");
+    async validate(item: SimpleValidateDto) {
+        console.log(item.aDto)
     }
 }
