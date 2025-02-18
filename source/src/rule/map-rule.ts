@@ -8,6 +8,7 @@ import {
   NonPrimitive,
   Primitive,
   MapperValidator,
+  NotVoid,
 } from "../utility-types";
 import { PropertiesRuleStore } from "./properties/properties-rule-store";
 import { ComplexityRuleStore } from "./complexity/complexity-rule-store";
@@ -90,17 +91,21 @@ export class MapRule<From, To> {
   property<C, V>(
     propertyFrom: (value: Primitive<ClassFields<From>>) => C,
     propertyTo: (value: Primitive<ClassFields<To>>) => V,
-    transform?: (property: C, from: From, to: To) => Promise<V>,
+    transform?: (property: C, from: From, to: To) => Promise<NotVoid<V>>,
   ): MapRule<From, To>;
   property<C, V>(
     propertyFrom: (value: Primitive<ClassFields<From>>) => C,
     propertyTo: (value: Primitive<ClassFields<To>>) => V,
-    transform?: (property: C, from: From, to: To) => V,
+    transform?: (property: C, from: From, to: To) => NotVoid<V>,
   ): MapRule<From, To>;
   property<C, V>(
     propertyFrom: (value: Primitive<ClassFields<From>>) => C,
     propertyTo: (value: Primitive<ClassFields<To>>) => V,
-    transform?: (property: C, from: From, to: To) => Promise<V> | V,
+    transform?: (
+      property: C,
+      from: From,
+      to: To,
+    ) => Promise<NotVoid<V>> | NotVoid<V>,
   ) {
     const propertyToName = this.getPropertyName(propertyTo);
     this.propertiesStore.addRule(
@@ -121,17 +126,21 @@ export class MapRule<From, To> {
   complex<C, V, N extends V>(
     propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C,
     propertyTo: (value: NonPrimitive<ClassFields<To>>) => V,
-    transform: (property: C, from: From, to: To) => Promise<N>,
+    transform: (property: C, from: From, to: To) => Promise<NotVoid<N>>,
   ): MapRule<From, To>;
   complex<C, V, N extends V>(
     propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C,
     propertyTo: (value: NonPrimitive<ClassFields<To>>) => V,
-    transform: (property: C, from: From, to: To) => N,
+    transform: (property: C, from: From, to: To) => NotVoid<N>,
   ): MapRule<From, To>;
   complex<C, V, N extends V>(
     propertyFrom: (value: NonPrimitive<ClassFields<From>>) => C,
     propertyTo: (value: NonPrimitive<ClassFields<To>>) => V,
-    transform?: (property: C, from: From, to: To) => Promise<N> | N,
+    transform?: (
+      property: C,
+      from: From,
+      to: To,
+    ) => Promise<NotVoid<N>> | NotVoid<N>,
   ) {
     const propertyToName = this.getPropertyName(propertyTo);
     this.complexityStore.addRule(
@@ -165,7 +174,7 @@ export class MapRule<From, To> {
 
   fill<Z>(
     propertyTo: (value: ClassFields<To>) => Z,
-    transform: (from: From, to: To) => Promise<Z> | Z,
+    transform: (from: From, to: To) => Promise<NotVoid<Z>> | NotVoid<Z>,
   ) {
     this.fillStore.addRule(this.getPropertyName(propertyTo), transform);
 

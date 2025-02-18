@@ -42,3 +42,5 @@ export type MapperValidator<
   V extends BaseMapperValidator,
   To,
 > = new () => MapperValidatorType<V, To>;
+
+export type NotVoid<Z> = Z extends void ? never : Z;

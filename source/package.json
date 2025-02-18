@@ -1,6 +1,6 @@
 {
-  "name": "mapper-lite",
-  "version": "0.0.1",
+  "name": "@mappers/core",
+  "version": "0.0.2",
   "description": "A versatile and powerful tool that allows you to organize convenient mapping between the layers of your application",
   "keywords": [
     "mapper",
@@ -24,13 +24,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/placDev/mapper-lite.git"
+    "url": "https://github.com/placDev/mappers.git"
   },
   "scripts": {
     "compile": "tsc",
     "copy-readme": "cp ./../README.md ./README.md",
     "build": "npm run compile && npm run copy-readme",
-    "test-build": "tsc && npm pack"
+    "test-build": "tsc && npm pack",
+    "publish": "npm publish --access public"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

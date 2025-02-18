@@ -35,7 +35,7 @@ class AgaProfile extends BaseMapperProfile {
       )
       .fill(
         (x) => x.test,
-        () => '999',
+        () => 'wer',
       );
   }
 }
