@@ -1,47 +1,37 @@
 import { PropertyRule } from "./property-rule";
 
 export class PropertiesRuleStore {
-    private store = new Map<string, Map<string, PropertyRule>>();
+  private store = new Map<string, Map<string, PropertyRule>>();
 
-    isEmpty() {
-        return this.store.size == 0;
+  isEmpty() {
+    return this.store.size == 0;
+  }
+
+  addRule(
+    propertyFrom: string,
+    propertyTo: string,
+    transform?: (...arg: any[]) => any,
+  ) {
+    this.initialFromState(propertyFrom);
+
+    const fromState = this.store.get(propertyFrom) as Map<string, PropertyRule>;
+    if (fromState.has(propertyTo)) {
+      throw new Error("Данное правило для свойства уже добавленно в маппер");
     }
 
-    addRule(propertyFrom: string, propertyTo: string, transform?: (...arg: any[]) => any) {
-        this.initialFromState(propertyFrom);
+    const newRule = new PropertyRule(propertyFrom, propertyTo, transform);
+    fromState.set(propertyTo, newRule);
 
-        let fromState = this.store.get(propertyFrom) as Map<string, PropertyRule>;
-        if(fromState.has(propertyTo)) {
-            throw new Error("Данное правило для свойства уже добавленно в маппер")
-        }
+    return newRule;
+  }
 
-        const newRule = new PropertyRule(propertyFrom, propertyTo, transform);
-        fromState.set(propertyTo, newRule);
+  getPropertyRules(): Array<PropertyRule> {
+    return [...this.store.values()].flatMap((x) => [...x.values()]);
+  }
 
-        return newRule;
+  private initialFromState(propertyFrom: string) {
+    if (!this.store.has(propertyFrom)) {
+      this.store.set(propertyFrom, new Map<string, PropertyRule>());
     }
-
-    getPropertyRules(): Array<PropertyRule> {
-        return [...this.store.values()].flatMap(x => [...x.values()])
-    }
-
-    //TODO Не нужен
-    getRule(propertyFrom: string, propertyTo: string) {
-        const fromState = this.store.get(propertyFrom);
-        if(!fromState) {
-            throw new Error(`Правила для ${propertyFrom} не найдены`)
-        }
-
-        if(!fromState.has(propertyTo)) {
-            throw new Error(`Правило для ${propertyFrom} и ${propertyTo} не найдено`)
-        }
-
-        return fromState.get(propertyTo) as PropertyRule;
-    }
-
-    private initialFromState(propertyFrom: string) {
-        if(!this.store.has(propertyFrom)) {
-            this.store.set(propertyFrom, new Map<string, PropertyRule>());
-        }
-    }
+  }
 }

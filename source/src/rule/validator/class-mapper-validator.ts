@@ -1,7 +1,8 @@
-import {BaseMapperValidator} from "./base-mapper-validator";
+import { BaseMapperValidator } from "./base-mapper-validator";
 
 export class ClassMapperValidator extends BaseMapperValidator {
-    validate<T extends Object>(item: T): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  validate<T extends object>(item: T): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }

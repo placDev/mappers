@@ -1,33 +1,37 @@
-import {FillRule} from "./fill-rule";
+import { FillRule } from "./fill-rule";
 
 export class FillRuleStore {
-    private propertiesToCache = new Set<string>();
-    private store = new Map<string, FillRule>();
+  private propertiesToCache = new Set<string>();
+  private store = new Map<string, FillRule>();
 
-    isEmpty() {
-        return this.store.size == 0;
+  isEmpty() {
+    return this.store.size == 0;
+  }
+
+  addToCache(propertyTo: string) {
+    this.propertiesToCache.add(propertyTo);
+  }
+
+  addRule(propertyTo: string, transform: (...arg: any[]) => any) {
+    if (this.propertiesToCache.has(propertyTo)) {
+      throw new Error(
+        `Для свойства ${propertyTo} уже определено правило в properties или complexity`,
+      );
     }
 
-    addToCache(propertyTo: string) {
-        this.propertiesToCache.add(propertyTo);
+    if (this.store.has(propertyTo)) {
+      throw new Error(
+        `Правило для свойства ${propertyTo} уже добавленно в маппер`,
+      );
     }
 
-    addRule(propertyTo: string, transform: (...arg: any[]) => any) {
-        if(this.propertiesToCache.has(propertyTo)) {
-            throw new Error(`Для свойства ${propertyTo} уже определено правило в properties или complexity`)
-        }
+    const newRule = new FillRule(propertyTo, transform);
+    this.store.set(propertyTo, newRule);
 
-        if(this.store.has(propertyTo)) {
-            throw new Error(`Правило для свойства ${propertyTo} уже добавленно в маппер`)
-        }
+    return newRule;
+  }
 
-        const newRule = new FillRule(propertyTo, transform);
-        this.store.set(propertyTo, newRule);
-
-        return newRule;
-    }
-
-    getFillRules(): Array<FillRule> {
-        return [...this.store.values()];
-    }
+  getFillRules(): Array<FillRule> {
+    return [...this.store.values()];
+  }
 }

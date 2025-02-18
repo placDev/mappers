@@ -34,7 +34,12 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.2",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0"
   },
   "dependencies": {
     "class-transformer": "^0.5.1",

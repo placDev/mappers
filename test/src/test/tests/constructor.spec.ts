@@ -1,90 +1,116 @@
-import {BaseMapperProfile} from "../../../../source/src/profile/base-mapper-profile";
-import {ProfileMapper} from "../../../../source/src/mapper/interfaces/profile-mapper.interface";
-import {MapperSettings} from "../../../../source/src/settings/mapper-settings";
-import {Mapper} from "../../../../source/src/mapper/mapper";
-
+import { BaseMapperProfile } from '../../../../source/src/profile/base-mapper-profile';
+import { ProfileMapper } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
+import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
+import { Mapper } from '../../../../source/src/mapper/mapper';
 
 class TestObjectConstructor {
-    testDto: string = "Bye";
+  testDto: string = 'Bye';
 }
 
 class TestObjectConstructorDto {
-    constructor() {
-        this.foo = "Hi";
-    }
+  constructor() {
+    this.foo = 'Hi';
+  }
 
-    test: string;
-    foo: string;
+  test: string;
+  foo: string;
 }
 
 class TestObjectConstructorTwoDto {
-    constructor(foo: string) {
-        this.foo = foo;
-    }
+  constructor(foo: string) {
+    this.foo = foo;
+  }
 
-    test: string;
-    foo: string;
+  test: string;
+  foo: string;
 }
 
 type ComplexNumber = { coefficient: number };
 class TestObjectConstructorComplexDto {
-    constructor(a: number[], b: number[], c: ComplexNumber) {
-        const concat = a.concat(b);
-        this.result = concat.reduce((x, currentValue) => (currentValue + x) * c.coefficient, 0);
-    }
+  constructor(a: number[], b: number[], c: ComplexNumber) {
+    const concat = a.concat(b);
+    this.result = concat.reduce(
+      (x, currentValue) => (currentValue + x) * c.coefficient,
+      0,
+    );
+  }
 
-    result: number = 0;
-    test: string;
+  result: number = 0;
+  test: string;
 }
 
 class TestConstructorFirstProfile extends BaseMapperProfile {
-    async define(mapper: ProfileMapper) {
-        mapper.addRule(TestObjectConstructor, TestObjectConstructorDto)
-            .callConstructor()
-            .property(x => x.testDto, x => x.test)
+  async define(mapper: ProfileMapper) {
+    mapper
+      .addRule(TestObjectConstructor, TestObjectConstructorDto)
+      .callConstructor()
+      .property(
+        (x) => x.testDto,
+        (x) => x.test,
+      );
 
-        mapper.addRule(TestObjectConstructor, TestObjectConstructorTwoDto)
-            .callConstructor(TestObjectConstructorTwoDto, async (call, from) => {
-                call(`Nice ${from.testDto}`);
-            })
-            .property(x => x.testDto, x => x.test)
+    mapper
+      .addRule(TestObjectConstructor, TestObjectConstructorTwoDto)
+      .callConstructor(TestObjectConstructorTwoDto, async (call, from) => {
+        call(`Nice ${from.testDto}`);
+      })
+      .property(
+        (x) => x.testDto,
+        (x) => x.test,
+      );
 
-        mapper.addRule(TestObjectConstructor, TestObjectConstructorComplexDto)
-            .callConstructor(TestObjectConstructorComplexDto, async (call) => {
-                call([1, 2, 3], [1, 2, 3], { coefficient: 10 });
-            })
-            .property(x => x.testDto, x => x.test)
-    }
+    mapper
+      .addRule(TestObjectConstructor, TestObjectConstructorComplexDto)
+      .callConstructor(TestObjectConstructorComplexDto, async (call) => {
+        call([1, 2, 3], [1, 2, 3], { coefficient: 10 });
+      })
+      .property(
+        (x) => x.testDto,
+        (x) => x.test,
+      );
+  }
 }
 
 describe('...', () => {
-    let mapper: Mapper;
+  let mapper: Mapper;
 
-    beforeEach(async () => {
-        MapperSettings.addProfile(TestConstructorFirstProfile);
-        MapperSettings.collectRules();
+  beforeEach(async () => {
+    MapperSettings.addProfile(TestConstructorFirstProfile);
+    MapperSettings.collectRules();
 
-        mapper = MapperSettings.getMapper();
-    });
+    mapper = MapperSettings.getMapper();
+  });
 
-    it('empty constructor', async () => {
-        const simple = new TestObjectConstructor();
+  it('empty constructor', async () => {
+    const simple = new TestObjectConstructor();
 
-        const first = await mapper.map(simple, TestObjectConstructor, TestObjectConstructorDto);
-        expect(first.foo).toEqual("Hi");
-    });
+    const first = await mapper.map(
+      simple,
+      TestObjectConstructor,
+      TestObjectConstructorDto,
+    );
+    expect(first.foo).toEqual('Hi');
+  });
 
-    it('first argument', async () => {
-        const simple = new TestObjectConstructor();
+  it('first argument', async () => {
+    const simple = new TestObjectConstructor();
 
-        const first = await mapper.map(simple, TestObjectConstructor, TestObjectConstructorTwoDto);
-        expect(first.foo).toEqual("Nice Bye");
-    })
+    const first = await mapper.map(
+      simple,
+      TestObjectConstructor,
+      TestObjectConstructorTwoDto,
+    );
+    expect(first.foo).toEqual('Nice Bye');
+  });
 
-    it('complex argument', async () => {
-        const simple = new TestObjectConstructor();
+  it('complex argument', async () => {
+    const simple = new TestObjectConstructor();
 
-        const first = await mapper.map(simple, TestObjectConstructor, TestObjectConstructorComplexDto);
-        expect(first.result).toEqual(1231230);
-    })
+    const first = await mapper.map(
+      simple,
+      TestObjectConstructor,
+      TestObjectConstructorComplexDto,
+    );
+    expect(first.result).toEqual(1231230);
+  });
 });

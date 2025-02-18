@@ -1,49 +1,53 @@
-import {ComplexRule} from "./complex-rule";
-import {MapRule} from "../map-rule";
-import {ProxyRule} from "../proxy-rule";
+import { ComplexRule } from "./complex-rule";
+import { ProxyRule } from "../proxy-rule";
 
 export class ComplexityRuleStore {
-    private store = new Map<string, Map<string, ComplexRule>>();
+  private store = new Map<string, Map<string, ComplexRule>>();
 
-    isEmpty() {
-        return this.store.size == 0;
+  isEmpty() {
+    return this.store.size == 0;
+  }
+
+  addRule(
+    propertyFrom: string,
+    propertyTo: string,
+    transform?: (...arg: any[]) => any,
+    rule?: ProxyRule<any, any>,
+  ) {
+    this.initialFromState(propertyFrom);
+
+    const fromState = this.store.get(propertyFrom) as Map<string, ComplexRule>;
+    if (fromState.has(propertyTo)) {
+      throw new Error("Данное правило для свойства уже добавленно в маппер");
     }
 
-    addRule(propertyFrom: string, propertyTo: string, transform?: (...arg: any[]) => any, rule?: ProxyRule<any, any>) {
-        this.initialFromState(propertyFrom);
+    const newRule = new ComplexRule(propertyFrom, propertyTo, transform, rule);
+    fromState.set(propertyTo, newRule);
 
-        let fromState = this.store.get(propertyFrom) as Map<string, ComplexRule>;
-        if(fromState.has(propertyTo)) {
-            throw new Error("Данное правило для свойства уже добавленно в маппер")
-        }
+    return newRule;
+  }
 
-        const newRule = new ComplexRule(propertyFrom, propertyTo, transform, rule);
-        fromState.set(propertyTo, newRule);
+  getComplexRules(): Array<ComplexRule> {
+    return [...this.store.values()].flatMap((x) => [...x.values()]);
+  }
 
-        return newRule;
+  //TODO Не нужен
+  getRule(propertyFrom: string, propertyTo: string) {
+    const fromState = this.store.get(propertyFrom);
+    if (!fromState) {
+      throw new Error(`Правила для ${propertyFrom} не найдены`);
     }
 
-    getComplexRules(): Array<ComplexRule> {
-        return [...this.store.values()].flatMap(x => [...x.values()])
+    if (!fromState.has(propertyTo)) {
+      throw new Error(`Правило для ${propertyFrom} и ${propertyTo} не найдено`);
     }
 
-    //TODO Не нужен
-    getRule(propertyFrom: string, propertyTo: string) {
-        const fromState = this.store.get(propertyFrom);
-        if(!fromState) {
-            throw new Error(`Правила для ${propertyFrom} не найдены`)
-        }
+    return fromState.get(propertyTo) as ComplexRule;
+  }
 
-        if(!fromState.has(propertyTo)) {
-            throw new Error(`Правило для ${propertyFrom} и ${propertyTo} не найдено`)
-        }
-
-        return fromState.get(propertyTo) as ComplexRule;
+  private initialFromState(propertyFrom: string) {
+    if (!this.store.has(propertyFrom)) {
+      this.store.set(propertyFrom, new Map<string, ComplexRule>());
     }
-
-    private initialFromState(propertyFrom: string) {
-        if(!this.store.has(propertyFrom)) {
-            this.store.set(propertyFrom, new Map<string, ComplexRule>());
-        }
-    }
+  }
 }

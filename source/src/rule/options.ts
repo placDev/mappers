@@ -1,3 +1,4 @@
 export interface Options {
-    isAllPropertyRequired: boolean;
+  //TODO
+  isAllPropertyRequired: boolean;
 }
