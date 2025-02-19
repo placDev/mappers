@@ -4,31 +4,43 @@ import { ConstructorType, MapperValidator } from "../utility-types";
 import { BaseMapperProfile } from "../profile/base-mapper-profile";
 import { SettingsValidatorStore } from "./settings-validator-store";
 import { BaseMapperValidator } from "../rule/validator/base-mapper-validator";
+import { Settings } from "./settings";
+import { CollectType } from "./enums/collect-type.enum";
+import { SettingsInterface } from "./interfaces/settings.interface";
 
 export class MapperSettings {
   private constructor() {}
+  static settings = Settings.createDefault();
 
   private static mapper = new Mapper();
   private static profiles = new ProfileStore();
-  private static validatorStore = new SettingsValidatorStore();
+  private static validators = new SettingsValidatorStore();
+
+  static setSettings(settings: Partial<SettingsInterface>) {
+    this.settings.update(settings);
+  }
 
   static addProfile(constructor: ConstructorType<BaseMapperProfile>) {
+    this.settings.accessOnlyType(CollectType.Default);
     this.profiles.addProfile(constructor);
   }
 
   static collectProfiles() {
+    this.settings.accessOnlyType(CollectType.Default);
     if (!this.profiles.instancesIsExists) {
       this.profiles.createInstances();
     }
 
-    this.collectProfileInstances();
+    this.defineProfiles();
   }
 
   static collectProfileInstances() {
-    this.profiles.instances.forEach((instance) => instance.define(this.mapper));
+    this.settings.accessOnlyType(CollectType.DI);
+    this.defineProfiles();
   }
 
   static addProfileInstance(instance: BaseMapperProfile) {
+    this.settings.accessOnlyType(CollectType.DI);
     this.profiles.addProfileInstance(instance);
   }
 
@@ -39,10 +51,14 @@ export class MapperSettings {
   static setDefaultValidator<T extends BaseMapperValidator>(
     validator: MapperValidator<T, any>,
   ) {
-    return this.validatorStore.setDefaultValidator(validator);
+    return this.validators.setDefaultValidator(validator);
   }
 
   static getValidatorStore() {
-    return this.validatorStore;
+    return this.validators;
+  }
+
+  private static defineProfiles() {
+    this.profiles.instances.forEach((instance) => instance.define(this.mapper));
   }
 }
