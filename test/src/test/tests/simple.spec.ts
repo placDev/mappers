@@ -67,7 +67,7 @@ describe('...', () => {
 
   beforeEach(async () => {
     MapperSettings.addProfile(AgaProfile);
-    MapperSettings.collectRules();
+    MapperSettings.collectProfiles();
 
     mapper = MapperSettings.getMapper();
   });

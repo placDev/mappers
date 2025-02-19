@@ -93,7 +93,7 @@ describe('...', () => {
   });
 
   it('test single map', async () => {
-    MapperSettings.collectRules();
+    MapperSettings.collectProfiles();
     mapper = MapperSettings.getMapper();
 
     const simple = new Simple(1);
@@ -112,7 +112,7 @@ describe('...', () => {
   });
 
   it('test array map', async () => {
-    MapperSettings.collectRules();
+    MapperSettings.collectProfiles();
     mapper = MapperSettings.getMapper();
 
     let counter = 0;

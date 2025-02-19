@@ -16,16 +16,20 @@ export class MapperSettings {
     this.profiles.addProfile(constructor);
   }
 
-  static collectRules() {
+  static collectProfiles() {
     if (!this.profiles.instancesIsExists) {
       this.profiles.createInstances();
     }
 
+    this.collectProfileInstances();
+  }
+
+  static collectProfileInstances() {
     this.profiles.instances.forEach((instance) => instance.define(this.mapper));
   }
 
-  static collectCreatedInstances(instances: BaseMapperProfile[]) {
-    instances.forEach((instance) => instance.define(this.mapper));
+  static addProfileInstance(instance: BaseMapperProfile) {
+    this.profiles.addProfileInstance(instance);
   }
 
   static getMapper() {

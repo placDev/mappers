@@ -92,7 +92,7 @@ describe('...', () => {
 
   beforeEach(async () => {
     MapperSettings.addProfile(TestComplexProfile);
-    MapperSettings.collectRules();
+    MapperSettings.collectProfiles();
 
     mapper = MapperSettings.getMapper();
   });

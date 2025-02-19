@@ -64,7 +64,7 @@ export class UserProfile extends BaseMapperProfile {
 }
 
 MapperSettings.addProfile(UserProfile);
-MapperSettings.collectRules();
+MapperSettings.collectProfiles();
 
 const mapper = MapperSettings.getMapper();
 

@@ -76,7 +76,7 @@ describe('...', () => {
 
   beforeEach(async () => {
     MapperSettings.addProfile(TestConstructorFirstProfile);
-    MapperSettings.collectRules();
+    MapperSettings.collectProfiles();
 
     mapper = MapperSettings.getMapper();
   });

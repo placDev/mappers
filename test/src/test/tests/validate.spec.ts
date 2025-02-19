@@ -38,7 +38,7 @@ describe('...', () => {
 
   it('.....', async () => {
     MapperSettings.setDefaultValidator(DefaultMapperValidator);
-    MapperSettings.collectRules();
+    MapperSettings.collectProfiles();
 
     mapper = MapperSettings.getMapper();
 

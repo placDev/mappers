@@ -48,7 +48,7 @@ describe('...', () => {
   });
 
   it('.....', async () => {
-    MapperSettings.collectRules();
+    MapperSettings.collectProfiles();
     mapper = MapperSettings.getMapper();
 
     const simple = new Simple();
