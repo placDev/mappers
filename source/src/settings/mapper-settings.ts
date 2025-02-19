@@ -24,6 +24,10 @@ export class MapperSettings {
     this.profiles.instances.forEach((instance) => instance.define(this.mapper));
   }
 
+  static collectCreatedInstances(instances: BaseMapperProfile[]) {
+    instances.forEach((instance) => instance.define(this.mapper));
+  }
+
   static getMapper() {
     return this.mapper;
   }
