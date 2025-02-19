@@ -44,6 +44,11 @@ export class MapperSettings {
     this.profiles.addProfileInstance(instance);
   }
 
+  static addCustomValidatorInstance(instance: BaseMapperValidator) {
+    this.settings.accessOnlyType(CollectType.DI);
+    this.validators.addValidatorInstance(instance);
+  }
+
   static getMapper() {
     return this.mapper;
   }

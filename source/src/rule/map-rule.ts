@@ -25,7 +25,6 @@ export class MapRule<From, To> {
   fillStore = new FillRuleStore();
 
   constructorRule: ConstructorRule<To>;
-  // TODO It's worth taking it to a higher level and creating a cache of validators for all rules.
   validatorRule = new ValidatorRule();
 
   private from: ConstructorType<From>;
@@ -40,10 +39,6 @@ export class MapRule<From, To> {
     this.to = to;
 
     this.constructorRule = new ConstructorRule(this.to);
-  }
-
-  settings(value: Options) {
-    return this;
   }
 
   callConstructor(): MapRule<From, To>;
@@ -182,7 +177,10 @@ export class MapRule<From, To> {
   }
 
   validate<T extends BaseMapperValidator>(validator?: MapperValidator<T, To>) {
-    if (validator === undefined && MapperSettings.getValidatorStore().isEmpty) {
+    if (
+      validator === undefined &&
+      MapperSettings.getValidatorStore().isDefaultValidatorEmpty
+    ) {
       throw new Error(
         `Не определен дефолтный валидатор или валидатор для правила ${this.from.name} и ${this.from.name}`,
       );

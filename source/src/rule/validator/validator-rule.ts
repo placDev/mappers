@@ -4,7 +4,6 @@ import { MapperSettings } from "../../settings/mapper-settings";
 export class ValidatorRule {
   private isEnabled: boolean = false;
   private validatorConstructor?: MapperValidator<any, any>;
-  private validatorInstance?: MapperValidatorType<any, any>;
 
   setEnabled() {
     this.isEnabled = true;
@@ -23,13 +22,14 @@ export class ValidatorRule {
       throw new Error("Валидатор отключен для данного правила");
     }
 
+    const validatorStore = MapperSettings.getValidatorStore();
+
     if (this.isExistCustomValidator) {
-      this.fillValidatorInstance();
-      return this.validatorInstance;
+      return validatorStore.getCustomValidator(this.validatorConstructor!);
     }
 
-    if (!MapperSettings.getValidatorStore().isEmpty) {
-      return MapperSettings.getValidatorStore().getDefaultValidator();
+    if (!validatorStore.isDefaultValidatorEmpty) {
+      return validatorStore.getDefaultValidator();
     }
 
     throw new Error("Дефолтный или кастомный валидатор не определен");
@@ -37,11 +37,5 @@ export class ValidatorRule {
 
   private get isExistCustomValidator() {
     return this.validatorConstructor !== undefined;
-  }
-
-  private fillValidatorInstance() {
-    if (!this.validatorInstance) {
-      this.validatorInstance = new this.validatorConstructor!();
-    }
   }
 }
