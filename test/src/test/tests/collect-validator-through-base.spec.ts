@@ -26,7 +26,7 @@ class SimpleProfile extends BaseMapperProfile {
         (x) => x.a,
         (x) => x.b,
       )
-      .validate(CustomValidator);
+      .validate();
   }
 }
 
@@ -36,9 +36,8 @@ describe('...', () => {
   beforeEach(async () => {
     MapperSettings.setSettings({
       collectType: CollectType.DI,
+      defaultValidator: CustomValidator,
     });
-
-    const validator = new CustomValidator();
 
     const profile = new SimpleProfile();
 

@@ -1,15 +1,18 @@
 import { MapperValidator, MapperValidatorType } from "../utility-types";
 import { BaseMapperValidator } from "../rule/validator/base-mapper-validator";
-import { MapperSettings } from "./mapper-settings";
+import { Settings } from "./settings";
 
 export class SettingsValidatorStore {
-  private defaultValidator?: MapperValidator<any, any>;
-  private validatorInstance?: MapperValidatorType<any, any>;
+  private defaultValidatorInstance?: MapperValidatorType<any, any>;
 
-  private instances = new Map<
-    MapperValidator<any, any>,
-    MapperValidatorType<any, any>
-  >();
+  private instances: Map<MapperValidator<any, any>, any>;
+
+  constructor(private settings: Settings) {
+    this.instances = new Map<
+      MapperValidator<any, any>,
+      MapperValidatorType<any, any>
+    >();
+  }
 
   addValidatorInstance(instance: BaseMapperValidator) {
     this.validateCustomValidatorInstance(instance);
@@ -27,18 +30,11 @@ export class SettingsValidatorStore {
       return this.instances.get(validator);
     }
 
-    if (MapperSettings.settings.isCollectDI) {
+    if (this.settings.isCollectDI) {
       throw new Error(`Запрошенный валидатор ${validator.name} не найден`);
     }
 
     return this.fillCustomValidatorInstance(validator);
-  }
-
-  //TODO Унести в настройки
-  setDefaultValidator<T extends BaseMapperValidator>(
-    validator: MapperValidator<T, any>,
-  ) {
-    this.defaultValidator = validator;
   }
 
   getDefaultValidator() {
@@ -48,16 +44,16 @@ export class SettingsValidatorStore {
 
     this.fillDefaultValidatorInstance();
 
-    return this.validatorInstance;
+    return this.defaultValidatorInstance;
   }
 
   get isDefaultValidatorEmpty() {
-    return this.defaultValidator === undefined;
+    return this.settings.defaultValidator === undefined;
   }
 
   private fillDefaultValidatorInstance() {
-    if (!this.validatorInstance) {
-      this.validatorInstance = new this.defaultValidator!();
+    if (!this.defaultValidatorInstance) {
+      this.defaultValidatorInstance = new this.settings.defaultValidator!();
     }
   }
 

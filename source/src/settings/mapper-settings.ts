@@ -1,6 +1,6 @@
 import { Mapper } from "../mapper/mapper";
 import { ProfileStore } from "../profile/profile-store";
-import { ConstructorType, MapperValidator } from "../utility-types";
+import { ConstructorType } from "../utility-types";
 import { BaseMapperProfile } from "../profile/base-mapper-profile";
 import { SettingsValidatorStore } from "./settings-validator-store";
 import { BaseMapperValidator } from "../rule/validator/base-mapper-validator";
@@ -14,7 +14,7 @@ export class MapperSettings {
 
   private static mapper = new Mapper();
   private static profiles = new ProfileStore();
-  private static validators = new SettingsValidatorStore();
+  private static validators = new SettingsValidatorStore(this.settings);
 
   static setSettings(settings: Partial<SettingsInterface>) {
     this.settings.update(settings);
@@ -51,12 +51,6 @@ export class MapperSettings {
 
   static getMapper() {
     return this.mapper;
-  }
-
-  static setDefaultValidator<T extends BaseMapperValidator>(
-    validator: MapperValidator<T, any>,
-  ) {
-    return this.validators.setDefaultValidator(validator);
   }
 
   static getValidatorStore() {

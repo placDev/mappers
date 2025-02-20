@@ -1,8 +1,11 @@
+import { BaseMapperValidator } from "../rule/validator/base-mapper-validator";
+import { MapperValidator } from "../utility-types";
 import { CollectType } from "./enums/collect-type.enum";
 import { SettingsInterface } from "./interfaces/settings.interface";
 
 export class Settings implements SettingsInterface {
   collectType: CollectType = CollectType.Default;
+  defaultValidator?: MapperValidator<BaseMapperValidator, any>;
 
   get isCollectDI() {
     return this.collectType === CollectType.DI;
@@ -20,6 +23,8 @@ export class Settings implements SettingsInterface {
     if (value.collectType) {
       this.collectType = value.collectType;
     }
+
+    this.defaultValidator = value.defaultValidator;
   }
 
   static createDefault() {
