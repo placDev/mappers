@@ -38,9 +38,8 @@ export type MapperValidatorType<
   V extends BaseMapperValidator,
   To,
 > = V["validate"] extends (item: To) => Promise<void> ? V : never;
-export type MapperValidator<
-  V extends BaseMapperValidator,
-  To,
-> = new () => MapperValidatorType<V, To>;
+export type MapperValidator<V extends BaseMapperValidator, To> = new (
+  ...arg: any[]
+) => MapperValidatorType<V, To>;
 
 export type NotVoid<Z> = Z extends void ? never : Z;
