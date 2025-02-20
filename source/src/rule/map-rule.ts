@@ -86,12 +86,12 @@ export class MapRule<From, To> {
   property<C, V>(
     propertyFrom: (value: Primitive<ClassFields<From>>) => C,
     propertyTo: (value: Primitive<ClassFields<To>>) => V,
-    transform?: (property: C, from: From, to: To) => Promise<NotVoid<V>>,
+    transform: (property: C, from: From, to: To) => Promise<NotVoid<V>>,
   ): MapRule<From, To>;
   property<C, V>(
     propertyFrom: (value: Primitive<ClassFields<From>>) => C,
     propertyTo: (value: Primitive<ClassFields<To>>) => V,
-    transform?: (property: C, from: From, to: To) => NotVoid<V>,
+    transform: (property: C, from: From, to: To) => NotVoid<V>,
   ): MapRule<From, To>;
   property<C, V>(
     propertyFrom: (value: Primitive<ClassFields<From>>) => C,
