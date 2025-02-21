@@ -1,6 +1,6 @@
 {
   "name": "@mappers/core",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A versatile and powerful tool that allows you to organize convenient mapping between the layers of your application",
   "keywords": [
     "mapper",

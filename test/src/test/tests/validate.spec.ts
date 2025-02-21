@@ -1,8 +1,8 @@
 import { BaseMapperProfile } from '../../../../source/src/profile/base-mapper-profile';
-import { ProfileMapper } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
+import { ProfileMapperInterface } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
 import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
-import { Mapper } from '../../../../source/src/mapper/mapper';
 import { DefaultMapperValidator } from '../validators/test-mapper-validator';
+import {MapperInterface} from "../../../../source/src";
 
 export class SimpleValidate {
   a: number = 100;
@@ -13,7 +13,7 @@ export class SimpleValidateDto {
 }
 
 class AgaProfile extends BaseMapperProfile {
-  async define(mapper: ProfileMapper) {
+  async define(mapper: ProfileMapperInterface) {
     mapper
       .addRule(SimpleValidate, SimpleValidateDto)
       .property(
@@ -28,14 +28,16 @@ class AgaProfile extends BaseMapperProfile {
 }
 
 describe('...', () => {
-  let mapper: Mapper;
+  let mapper: MapperInterface;
 
   beforeEach(async () => {
     MapperSettings.addProfile(AgaProfile);
   });
 
   it('.....', async () => {
-    MapperSettings.setDefaultValidator(DefaultMapperValidator);
+    MapperSettings.setSettings({
+      defaultValidator: DefaultMapperValidator,
+    });
     MapperSettings.collectProfiles();
 
     mapper = MapperSettings.getMapper();

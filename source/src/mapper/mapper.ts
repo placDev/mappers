@@ -1,6 +1,6 @@
 import { RuleStore } from "../rule/rule-store";
 import { ConstructorType, MapperValidatorType } from "../utility-types";
-import { ProfileMapper } from "./interfaces/profile-mapper.interface";
+import { ProfileMapperInterface } from "./interfaces/profile-mapper.interface";
 import { MapRule } from "../rule/map-rule";
 import { plainToInstance } from "class-transformer";
 import { PropertyRule } from "../rule/properties/property-rule";
@@ -8,8 +8,9 @@ import { ComplexRule } from "../rule/complexity/complex-rule";
 import { Cloner } from "../utils/cloner";
 import { ProxyRule } from "../rule/proxy-rule";
 import { FillRule } from "../rule/fill/fill-rule";
+import { MapperInterface } from "./interfaces/mapper.interface";
 
-export class Mapper implements ProfileMapper {
+export class Mapper implements MapperInterface, ProfileMapperInterface {
   private store = new RuleStore();
 
   addRule<F, T>(from: ConstructorType<F>, to: ConstructorType<T>) {

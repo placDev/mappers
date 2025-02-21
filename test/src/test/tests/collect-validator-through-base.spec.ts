@@ -1,7 +1,10 @@
 import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
-import { Mapper } from '../../../../source/src/mapper/mapper';
-import {BaseMapperProfile, BaseMapperValidator} from '../../../../source/src';
-import { ProfileMapper } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
+import {
+  BaseMapperProfile,
+  BaseMapperValidator,
+  MapperInterface,
+} from '../../../../source/src';
+import { ProfileMapperInterface } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
 import { CollectType } from '../../../../source/src/settings/enums/collect-type.enum';
 
 class Simple {
@@ -19,7 +22,7 @@ class CustomValidator extends BaseMapperValidator {
 }
 
 class SimpleProfile extends BaseMapperProfile {
-  async define(mapper: ProfileMapper) {
+  async define(mapper: ProfileMapperInterface) {
     mapper
       .addRule(Simple, SimpleDto)
       .property(
@@ -31,7 +34,7 @@ class SimpleProfile extends BaseMapperProfile {
 }
 
 describe('...', () => {
-  let mapper: Mapper;
+  let mapper: MapperInterface;
 
   beforeEach(async () => {
     MapperSettings.setSettings({

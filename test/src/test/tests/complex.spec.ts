@@ -1,7 +1,7 @@
 import { BaseMapperProfile } from '../../../../source/src/profile/base-mapper-profile';
-import { ProfileMapper } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
+import { ProfileMapperInterface } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
 import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
-import { Mapper } from '../../../../source/src/mapper/mapper';
+import { MapperInterface } from '../../../../source/src';
 
 interface SimpleInterface {
   name: string;
@@ -50,7 +50,7 @@ class SimpleDto {
 }
 
 class TestComplexProfile extends BaseMapperProfile {
-  async define(mapper: ProfileMapper) {
+  async define(mapper: ProfileMapperInterface) {
     mapper
       .addRule(Simple, SimpleDto)
       .complex(
@@ -88,7 +88,7 @@ class TestComplexProfile extends BaseMapperProfile {
 }
 
 describe('...', () => {
-  let mapper: Mapper;
+  let mapper: MapperInterface;
 
   beforeEach(async () => {
     MapperSettings.addProfile(TestComplexProfile);

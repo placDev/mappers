@@ -2,7 +2,7 @@
 /////
 import { BaseMapperProfile } from '../../../../source/src/profile/base-mapper-profile';
 import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
-import { ProfileMapper } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
+import { ProfileMapperInterface } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
 
 class User {
   constructor(toot: string, cit: number) {}
@@ -21,7 +21,7 @@ class UserDto {
 ////////////
 
 export class UserProfile extends BaseMapperProfile {
-  async define(mapper: ProfileMapper) {
+  async define(mapper: ProfileMapperInterface) {
     mapper
       .addRule(UserDto, User)
       .setToken('123')

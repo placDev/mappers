@@ -1,7 +1,7 @@
 import { BaseMapperProfile } from '../../../../source/src/profile/base-mapper-profile';
-import { ProfileMapper } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
+import { ProfileMapperInterface } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
 import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
-import { Mapper } from '../../../../source/src/mapper/mapper';
+import { MapperInterface } from '../../../../source/src';
 
 class TestObjectConstructor {
   testDto: string = 'Bye';
@@ -40,7 +40,7 @@ class TestObjectConstructorComplexDto {
 }
 
 class TestConstructorFirstProfile extends BaseMapperProfile {
-  async define(mapper: ProfileMapper) {
+  async define(mapper: ProfileMapperInterface) {
     mapper
       .addRule(TestObjectConstructor, TestObjectConstructorDto)
       .callConstructor()
@@ -72,7 +72,7 @@ class TestConstructorFirstProfile extends BaseMapperProfile {
 }
 
 describe('...', () => {
-  let mapper: Mapper;
+  let mapper: MapperInterface;
 
   beforeEach(async () => {
     MapperSettings.addProfile(TestConstructorFirstProfile);

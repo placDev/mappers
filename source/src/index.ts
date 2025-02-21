@@ -1,4 +1,6 @@
-export { Mapper } from "./mapper/mapper";
+export { MapperInterface } from "./mapper/interfaces/mapper.interface";
+export { ProfileMapperInterface } from "./mapper/interfaces/profile-mapper.interface";
+
 export { BaseMapperProfile } from "./profile/base-mapper-profile";
 export { BaseMapperValidator } from "./rule/validator/base-mapper-validator";
 export { ConstructorType } from "./utility-types";

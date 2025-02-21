@@ -1,4 +1,4 @@
-import { ProfileMapper } from "../mapper/interfaces/profile-mapper.interface";
+import { ProfileMapperInterface } from "../mapper/interfaces/profile-mapper.interface";
 import { MapperSettings } from "../settings/mapper-settings";
 
 export abstract class BaseMapperProfile {
@@ -8,5 +8,5 @@ export abstract class BaseMapperProfile {
     }
   }
 
-  abstract define(mapper: ProfileMapper): Promise<void>;
+  abstract define(mapper: ProfileMapperInterface): Promise<void>;
 }
