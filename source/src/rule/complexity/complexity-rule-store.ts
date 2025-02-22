@@ -5,6 +5,7 @@ import { RuleErrorHelper } from "../../errors/rule/rule.error.helper";
 
 export class ComplexityRuleStore {
   private store = new Map<string, Map<string, ComplexRule>>();
+  private flatStoreCache: Array<ComplexRule> = [];
 
   isEmpty() {
     return this.store.size == 0;
@@ -26,18 +27,26 @@ export class ComplexityRuleStore {
     }
 
     const newRule = new ComplexRule(propertyFrom, propertyTo, transform, rule);
-    fromState.set(propertyTo, newRule);
+    this.updateStore(fromState, newRule);
 
     return newRule;
   }
 
   getComplexRules(): Array<ComplexRule> {
-    return [...this.store.values()].flatMap((x) => [...x.values()]);
+    return this.flatStoreCache;
   }
 
   private initialFromState(propertyFrom: string) {
     if (!this.store.has(propertyFrom)) {
       this.store.set(propertyFrom, new Map<string, ComplexRule>());
     }
+  }
+
+  private updateStore(
+    fromState: Map<string, ComplexRule>,
+    newRule: ComplexRule,
+  ) {
+    fromState.set(newRule.propertyTo, newRule);
+    this.flatStoreCache.push(newRule);
   }
 }

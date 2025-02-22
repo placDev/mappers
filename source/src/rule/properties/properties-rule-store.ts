@@ -4,6 +4,7 @@ import { RuleErrorHelper } from "../../errors/rule/rule.error.helper";
 
 export class PropertiesRuleStore {
   private store = new Map<string, Map<string, PropertyRule>>();
+  private flatStoreCache: Array<PropertyRule> = [];
 
   isEmpty() {
     return this.store.size == 0;
@@ -24,18 +25,26 @@ export class PropertiesRuleStore {
     }
 
     const newRule = new PropertyRule(propertyFrom, propertyTo, transform);
-    fromState.set(propertyTo, newRule);
+    this.updateStore(fromState, newRule);
 
     return newRule;
   }
 
   getPropertyRules(): Array<PropertyRule> {
-    return [...this.store.values()].flatMap((x) => [...x.values()]);
+    return this.flatStoreCache;
   }
 
   private initialFromState(propertyFrom: string) {
     if (!this.store.has(propertyFrom)) {
       this.store.set(propertyFrom, new Map<string, PropertyRule>());
     }
+  }
+
+  private updateStore(
+    fromState: Map<string, PropertyRule>,
+    newRule: PropertyRule,
+  ) {
+    fromState.set(newRule.propertyTo, newRule);
+    this.flatStoreCache.push(newRule);
   }
 }

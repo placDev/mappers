@@ -9,6 +9,7 @@ import { Cloner } from "../utils/cloner";
 import { ProxyRule } from "../rule/proxy-rule";
 import { FillRule } from "../rule/fill/fill-rule";
 import { MapperInterface } from "./interfaces/mapper.interface";
+import { NotPrototypeObjectError } from "../errors/not-prototype-object.error";
 
 export class Mapper implements MapperInterface, ProfileMapperInterface {
   private store = new RuleStore();
@@ -113,7 +114,7 @@ export class Mapper implements MapperInterface, ProfileMapperInterface {
         ? values.some((x) => x.constructor === Object)
         : values.constructor === Object
     ) {
-      throw Error("Объект не является классом");
+      throw new NotPrototypeObjectError();
     }
   }
 
