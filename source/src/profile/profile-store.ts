@@ -1,5 +1,7 @@
 import { BaseMapperProfile } from "./base-mapper-profile";
 import { ConstructorType } from "../utility-types";
+import { ProfileError } from "../errors/profile/profile.error";
+import { ProfileErrorHelper } from "../errors/profile/profile.error.helper";
 
 export class ProfileStore {
   instances = new Map<ConstructorType<BaseMapperProfile>, BaseMapperProfile>();
@@ -31,13 +33,13 @@ export class ProfileStore {
 
   private validateProfileInstance(instance: BaseMapperProfile) {
     if (!(instance instanceof BaseMapperProfile)) {
-      throw new Error(`Объект не является наследником BaseMapperProfile`);
+      throw new ProfileError(ProfileErrorHelper.notExtendsProfile());
     }
 
     // @ts-ignore
     if (this.instances.has(instance.constructor)) {
-      throw new Error(
-        `Экземпляр профиля ${instance.constructor.name} уже создан`,
+      throw new ProfileError(
+        ProfileErrorHelper.alredyCreated(instance.constructor.name),
       );
     }
   }

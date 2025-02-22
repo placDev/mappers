@@ -1,4 +1,6 @@
 import { FillRule } from "./fill-rule";
+import { FillError } from "../../errors/fill/fill.error";
+import { FillErrorHelper } from "../../errors/fill/fill.error.helper";
 
 export class FillRuleStore {
   private propertiesToCache = new Set<string>();
@@ -14,15 +16,13 @@ export class FillRuleStore {
 
   addRule(propertyTo: string, transform: (...arg: any[]) => any) {
     if (this.propertiesToCache.has(propertyTo)) {
-      throw new Error(
-        `Для свойства ${propertyTo} уже определено правило в properties или complexity`,
+      throw new FillError(
+        FillErrorHelper.alredyExistInPropertiesOrComplexity(propertyTo),
       );
     }
 
     if (this.store.has(propertyTo)) {
-      throw new Error(
-        `Правило для свойства ${propertyTo} уже добавленно в маппер`,
-      );
+      throw new FillError(FillErrorHelper.alredyAdded(propertyTo));
     }
 
     const newRule = new FillRule(propertyTo, transform);

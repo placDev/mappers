@@ -1,1 +1,1 @@
-export { NotImplementedException } from "./not-implemented-exception.error";
+export { BaseException } from "./base.error";

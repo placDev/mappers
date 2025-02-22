@@ -1,5 +1,7 @@
 import { ComplexRule } from "./complex-rule";
 import { ProxyRule } from "../proxy-rule";
+import { RuleError } from "../../errors/rule/rule.error";
+import { RuleErrorHelper } from "../../errors/rule/rule.error.helper";
 
 export class ComplexityRuleStore {
   private store = new Map<string, Map<string, ComplexRule>>();
@@ -18,7 +20,9 @@ export class ComplexityRuleStore {
 
     const fromState = this.store.get(propertyFrom) as Map<string, ComplexRule>;
     if (fromState.has(propertyTo)) {
-      throw new Error("Данное правило для свойства уже добавленно в маппер");
+      throw new RuleError(
+        RuleErrorHelper.alredyAdded(propertyFrom, propertyTo),
+      );
     }
 
     const newRule = new ComplexRule(propertyFrom, propertyTo, transform, rule);
@@ -29,20 +33,6 @@ export class ComplexityRuleStore {
 
   getComplexRules(): Array<ComplexRule> {
     return [...this.store.values()].flatMap((x) => [...x.values()]);
-  }
-
-  //TODO Не нужен
-  getRule(propertyFrom: string, propertyTo: string) {
-    const fromState = this.store.get(propertyFrom);
-    if (!fromState) {
-      throw new Error(`Правила для ${propertyFrom} не найдены`);
-    }
-
-    if (!fromState.has(propertyTo)) {
-      throw new Error(`Правило для ${propertyFrom} и ${propertyTo} не найдено`);
-    }
-
-    return fromState.get(propertyTo) as ComplexRule;
   }
 
   private initialFromState(propertyFrom: string) {

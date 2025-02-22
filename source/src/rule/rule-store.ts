@@ -1,5 +1,7 @@
 import { ConstructorType } from "../utility-types";
 import { MapRule } from "./map-rule";
+import { RuleError } from "../errors/rule/rule.error";
+import { RuleErrorHelper } from "../errors/rule/rule.error.helper";
 
 export class RuleStore {
   private store = new Map<
@@ -15,7 +17,7 @@ export class RuleStore {
       MapRule<any, any>
     >;
     if (fromState.has(to)) {
-      throw new Error("Данное правило уже добавленно в маппер");
+      throw new RuleError(RuleErrorHelper.alredyAdded(from.name, to.name));
     }
 
     const newRule = new MapRule(from, to);
@@ -27,11 +29,11 @@ export class RuleStore {
   getRule<F, T>(from: ConstructorType<F>, to: ConstructorType<T>) {
     const fromState = this.store.get(from);
     if (!fromState) {
-      throw new Error(`Правила для ${from.name} не найдены`);
+      throw new RuleError(RuleErrorHelper.fromNotFound(from.name));
     }
 
     if (!fromState.has(to)) {
-      throw new Error(`Правило для ${from.name} и ${to.name} не найдено`);
+      throw new RuleError(RuleErrorHelper.toInFromNotFound(from.name, to.name));
     }
 
     return fromState.get(to) as MapRule<F, T>;

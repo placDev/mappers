@@ -18,6 +18,8 @@ import { FillRuleStore } from "./fill/fill-rule-store";
 import { BaseMapperValidator } from "./validator/base-mapper-validator";
 import { ValidatorRule } from "./validator/validator-rule";
 import { MapperSettings } from "../settings/mapper-settings";
+import { ValidatorError } from "../errors/validator/validator.error";
+import { ValidatorErrorHelper } from "../errors/validator/validator.error.helper";
 
 export class MapRule<From, To> {
   propertiesStore = new PropertiesRuleStore();
@@ -181,8 +183,11 @@ export class MapRule<From, To> {
       validator === undefined &&
       MapperSettings.getValidatorStore().isDefaultValidatorEmpty
     ) {
-      throw new Error(
-        `Не определен дефолтный валидатор или валидатор для правила ${this.from.name} и ${this.from.name}`,
+      throw new ValidatorError(
+        ValidatorErrorHelper.notFoundDefaultOrCustomByRule(
+          this.from.name,
+          this.from.name,
+        ),
       );
     }
 

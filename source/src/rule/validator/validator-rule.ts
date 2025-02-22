@@ -1,5 +1,7 @@
 import { MapperValidator, MapperValidatorType } from "../../utility-types";
 import { MapperSettings } from "../../settings/mapper-settings";
+import { ValidatorError } from "../../errors/validator/validator.error";
+import { ValidatorErrorHelper } from "../../errors/validator/validator.error.helper";
 
 export class ValidatorRule {
   private isEnabled: boolean = false;
@@ -19,7 +21,7 @@ export class ValidatorRule {
 
   getValidator(): MapperValidatorType<any, any> {
     if (!this.isEnabled) {
-      throw new Error("Валидатор отключен для данного правила");
+      throw new ValidatorError(ValidatorErrorHelper.disabled());
     }
 
     const validatorStore = MapperSettings.getValidatorStore();
@@ -32,7 +34,9 @@ export class ValidatorRule {
       return validatorStore.getDefaultValidator();
     }
 
-    throw new Error("Дефолтный или кастомный валидатор не определен");
+    throw new ValidatorError(
+      ValidatorErrorHelper.defaultOrCustomValidatorNotFound(),
+    );
   }
 
   private get isExistCustomValidator() {

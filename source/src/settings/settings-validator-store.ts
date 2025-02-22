@@ -1,6 +1,8 @@
 import { MapperValidator, MapperValidatorType } from "../utility-types";
 import { BaseMapperValidator } from "../rule/validator/base-mapper-validator";
 import { Settings } from "./settings";
+import { ValidatorError } from "../errors/validator/validator.error";
+import { ValidatorErrorHelper } from "../errors/validator/validator.error.helper";
 
 export class SettingsValidatorStore {
   private defaultValidatorInstance?: MapperValidatorType<any, any>;
@@ -31,7 +33,7 @@ export class SettingsValidatorStore {
     }
 
     if (this.settings.isCollectDI) {
-      throw new Error(`Запрошенный валидатор ${validator.name} не найден`);
+      throw new ValidatorError(ValidatorErrorHelper.notFound(validator.name));
     }
 
     return this.fillCustomValidatorInstance(validator);
@@ -39,7 +41,7 @@ export class SettingsValidatorStore {
 
   getDefaultValidator() {
     if (this.isDefaultValidatorEmpty) {
-      throw new Error("Дефолтный валидатор не установлен");
+      throw new ValidatorError(ValidatorErrorHelper.defaultAlredySet());
     }
 
     this.fillDefaultValidatorInstance();
@@ -63,13 +65,13 @@ export class SettingsValidatorStore {
 
   private validateCustomValidatorInstance(instance: BaseMapperValidator) {
     if (!(instance instanceof BaseMapperValidator)) {
-      throw new Error(`Объект не является наследником BaseMapperValidator`);
+      throw new ValidatorError(ValidatorErrorHelper.notExtendsValidator());
     }
 
     // @ts-ignore
     if (this.instances.has(instance.constructor)) {
-      throw new Error(
-        `Экземпляр валидатора ${instance.constructor.name} уже создан`,
+      throw new ValidatorError(
+        ValidatorErrorHelper.alredyCreated(instance.constructor.name),
       );
     }
   }
