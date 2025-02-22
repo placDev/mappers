@@ -1,1 +1,0 @@
-export { BaseException } from "./base.error";
