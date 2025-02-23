@@ -189,7 +189,7 @@ export class Mapper implements MapperInterface, ProfileMapperInterface {
   private async invokeFill(raw: any, fillRules: FillRule[], value: any) {
     for (const fillRule of fillRules) {
       // @ts-ignore
-      raw[fillRule.propertyTo] = await fillRule.transform(value, raw);
+      raw[fillRule.propertyTo] = await fillRule.filler(value, raw);
     }
   }
 

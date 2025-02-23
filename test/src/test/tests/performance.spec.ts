@@ -1,7 +1,7 @@
 import { BaseMapperProfile } from '../../../../source/src/profile/base-mapper-profile';
 import { ProfileMapperInterface } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
 import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
-import {MapperInterface} from "../../../../source/src";
+import { MapperInterface } from '../../../../source/src';
 
 class Test {
   testData = '3003003';
@@ -69,10 +69,10 @@ class AgaProfile extends BaseMapperProfile {
         mapper.withRule(Test, TestDto),
       )
       .fill(
-        (x) => x.result,
         (from) => {
           return from.c + from.b;
         },
+        (x) => x.result,
       );
 
     mapper

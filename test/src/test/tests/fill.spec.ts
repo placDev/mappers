@@ -28,14 +28,14 @@ class AgaProfile extends BaseMapperProfile {
         (x) => x.aDto,
       )
       .fill(
-        (x) => x.result,
         (from) => {
           return from.c + from.b;
         },
+        (x) => x.result,
       )
       .fill(
-        (x) => x.test,
         () => 'wer',
+        (x) => x.test,
       );
   }
 }

@@ -14,7 +14,7 @@ export class FillRuleStore {
     this.propertiesToCache.add(propertyTo);
   }
 
-  addRule(propertyTo: string, transform: (...arg: any[]) => any) {
+  addRule(propertyTo: string, filler: (...arg: any[]) => any) {
     if (this.propertiesToCache.has(propertyTo)) {
       throw new FillError(
         FillErrorHelper.alredyExistInPropertiesOrComplexity(propertyTo),
@@ -25,7 +25,7 @@ export class FillRuleStore {
       throw new FillError(FillErrorHelper.alredyAdded(propertyTo));
     }
 
-    const newRule = new FillRule(propertyTo, transform);
+    const newRule = new FillRule(propertyTo, filler);
     this.store.set(propertyTo, newRule);
 
     return newRule;

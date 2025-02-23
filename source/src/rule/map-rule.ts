@@ -170,10 +170,10 @@ export class MapRule<From, To> {
   }
 
   fill<Z>(
+    filler: (from: From, to: To) => Promise<NotVoid<Z>> | NotVoid<Z>,
     propertyTo: (value: ClassFields<To>) => Z,
-    transform: (from: From, to: To) => Promise<NotVoid<Z>> | NotVoid<Z>,
   ) {
-    this.fillStore.addRule(this.getPropertyName(propertyTo), transform);
+    this.fillStore.addRule(this.getPropertyName(propertyTo), filler);
 
     return this;
   }
