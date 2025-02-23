@@ -30,8 +30,16 @@ export type CallConstructorCallback<ToConstructor, From> = (
 ) => void | Promise<void>;
 
 export type IntersectionProperty = { "@prop": symbol };
-export type IntersectionProperties<T, U> = {
-  [K in Extract<keyof Primitive<T>, keyof Primitive<U>>]: IntersectionProperty;
+export type IntersectionProperties<T, U> = IntersectionPropertiesInner<
+  Primitive<T>,
+  Primitive<U>
+>;
+type IntersectionPropertiesInner<T, U> = {
+  [K in keyof T & keyof U as T[K] extends U[K]
+    ? U[K] extends T[K]
+      ? K
+      : never
+    : never]: IntersectionProperty;
 };
 
 export type MapperValidatorType<
