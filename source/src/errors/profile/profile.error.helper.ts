@@ -1,9 +1,9 @@
 export class ProfileErrorHelper {
   static notExtendsProfile() {
-    return `Объект не является наследником BaseMapperProfile`;
+    return `The object is not an inheritor of BaseMapperProfile`;
   }
 
   static alredyCreated(profileName: string) {
-    return `Экземпляр профиля ${profileName} уже создан`;
+    return `An instance of the profile '${profileName}' has already been created`;
   }
 }

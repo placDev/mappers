@@ -111,8 +111,8 @@ export class Mapper implements MapperInterface, ProfileMapperInterface {
   private checkObjectsIsNotAnonymous<V extends object>(values: V | V[]) {
     if (
       Array.isArray(values)
-        ? values.some((x) => x.constructor === Object)
-        : values.constructor === Object
+        ? values.some((x) => !(x instanceof Object) || x.constructor === Object)
+        : !(values instanceof Object) || values.constructor === Object
     ) {
       throw new NotPrototypeObjectError();
     }
@@ -122,7 +122,6 @@ export class Mapper implements MapperInterface, ProfileMapperInterface {
     rule: MapRule<F, T>,
     value: V,
   ) {
-    //plainToInstance(Person, plainPerson, { excludeExtraneousValues: true })
     if (rule.constructorRule.isEnabled()) {
       return await rule.constructorRule.invokeCreateFunction(value);
     }

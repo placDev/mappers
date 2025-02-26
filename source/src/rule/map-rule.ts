@@ -1,4 +1,3 @@
-import { Options } from "./options";
 import {
   CallConstructorCallback,
   ClassFields,

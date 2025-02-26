@@ -1,5 +1,5 @@
 export class SettingsErrorHelper {
   static accessOnlyType(type: string) {
-    return `Функция доступна только при использовании ${type} типа сборки`;
+    return `The function is only available when using the '${type}' collect type`;
   }
 }

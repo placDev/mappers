@@ -1,13 +1,13 @@
 export class RuleErrorHelper {
   static fromNotFound(fromName: string) {
-    return `Правила для ${fromName} не найдены`;
+    return `No rules found for '${fromName}'`;
   }
 
   static toInFromNotFound(fromName: string, toName: string) {
-    return `Правило для ${fromName} и ${toName} не найдено`;
+    return `Rule for '${fromName}' and '${toName}' not found`;
   }
 
   static alredyAdded(fromName: string, toName: string) {
-    return `Правило для ${fromName} и ${toName} уже добавлено в маппер`;
+    return `The rule for '${fromName}' and '${toName}' has already been added to the mapper`;
   }
 }

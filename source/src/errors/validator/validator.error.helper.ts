@@ -1,29 +1,29 @@
 export class ValidatorErrorHelper {
   static notExtendsValidator() {
-    return `Объект не является наследником BaseMapperValidator`;
+    return `The object is not an inheritor of the BaseMapperValidator`;
   }
 
   static alredyCreated(validatorName: string) {
-    return `Экземпляр валидатора ${validatorName} уже создан`;
+    return `An instance of the validator '${validatorName}' has already been created`;
   }
 
   static notFound(validatorName: string) {
-    return `Валидатор ${validatorName} не найден`;
+    return `The validator '${validatorName}' was not found`;
   }
 
   static defaultAlredySet() {
-    return `Дефолтный валидатор не установлен`;
+    return `The default validator is not installed`;
   }
 
   static defaultOrCustomValidatorNotFound() {
-    return `Дефолтный или кастомный валидатор не определен`;
+    return `The default or custom validator is not defined`;
   }
 
   static disabled() {
-    return `Валидатор отключен для данного правила`;
+    return `The validator is disabled for this rule`;
   }
 
   static notFoundDefaultOrCustomByRule(fromName: string, toName: string) {
-    return ``;
+    return `There is no custom validator defined for the rule '${fromName} and '${toName}' and there is no default validator`;
   }
 }

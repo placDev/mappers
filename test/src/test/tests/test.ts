@@ -1,5 +1,3 @@
-//TODO Уникальные ключи для правил что бы можно было несколько рулов пвеовешать
-/////
 import { BaseMapperProfile } from '../../../../source/src/profile/base-mapper-profile';
 import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
 import { ProfileMapperInterface } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
