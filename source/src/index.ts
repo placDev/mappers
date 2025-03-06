@@ -1,3 +1,4 @@
+export { Cloner } from "./utils/cloner";
 export { MapperInterface } from "./mapper/interfaces/mapper.interface";
 export { ProfileMapperInterface } from "./mapper/interfaces/profile-mapper.interface";
 

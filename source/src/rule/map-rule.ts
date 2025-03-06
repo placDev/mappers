@@ -76,10 +76,6 @@ export class MapRule<From, To> {
     return this;
   }
 
-  setToken(value: string | number | symbol) {
-    return this;
-  }
-
   property<C>(
     propertyFrom: (value: Primitive<ClassFields<From>>) => C,
     propertyTo: (value: Primitive<ClassFields<To>>) => C,
@@ -171,7 +167,7 @@ export class MapRule<From, To> {
   fill<Z>(
     filler: (from: From, to: To) => Promise<NotVoid<Z>> | NotVoid<Z>,
     propertyTo: (value: ClassFields<To>) => Z,
-  ) {
+  ): MapRule<From, To> {
     this.fillStore.addRule(this.getPropertyName(propertyTo), filler);
 
     return this;

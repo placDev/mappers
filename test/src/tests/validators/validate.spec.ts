@@ -1,7 +1,7 @@
 import { BaseMapperProfile } from '../../../../source/src/profile/base-mapper-profile';
 import { ProfileMapperInterface } from '../../../../source/src/mapper/interfaces/profile-mapper.interface';
 import { MapperSettings } from '../../../../source/src/settings/mapper-settings';
-import { DefaultMapperValidator } from '../validators/test-mapper-validator';
+import { DefaultMapperValidator } from './utils/test-mapper-validator';
 import {MapperInterface} from "../../../../source/src";
 
 export class SimpleValidate {
