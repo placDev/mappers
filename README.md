@@ -97,7 +97,7 @@ class OrderProfile extends BaseMapperProfile {
 ##### _4) Validators_
 A class that provides verification of each transformed object according to a custom scenario.
 <br/>You can define a default validator (you don't have to pass an argument to .validate() for a rule) or define a custom validator for a specific rule.
-<br/>To work correctly, all your validators must be extended from the **BaseMapperValidator**.
+<br/>To work correctly, all your validators must be **extended** from the **BaseMapperValidator**.
 <br/>Note that the validator class can have only one instance, otherwise a **ValidatorError** error will be thrown.
 ```typescript
 export class OrderValidator extends BaseMapperValidator {
