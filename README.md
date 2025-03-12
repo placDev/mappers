@@ -10,13 +10,14 @@ A fast, simple, and powerful library that helps you design your application **la
 
 - [Installation](#installation)
 - [Idea](#idea)
+- [Examples](#examples)
 - [Glossary](#glossary)
 - [Mapper](#mapper)
 - [Profiles](#profiles)
 - [Rules](#rules)
 - [Validators](#validators)
+- [Raw usage](#raw-usage)
 - [Error description](#error-description)
-- [Examples](#examples)
 
 ## Installation
 
@@ -40,6 +41,9 @@ For example:<br>
 | Layer of data transfer from <br/> controllers and their validation. | Layer of business logic. <br/> Models reflecting business <br/> entities and their methods. | Layer of data access.<br/> Isolates details of working <br/> with a database or cache.  |
 
 Or any other set of layers you need :)
+
+## Examples
+You can see the example by clicking on the link [Examples](https://github.com/placDev/mappers)
 
 ## Glossary
 ##### _1) Mapper_
@@ -144,9 +148,12 @@ class OrderProfile extends BaseMapperProfile {
     async define(mapper: ProfileMapperInterface) {
         mapper
             .addRule(OrderEntity, Order)
-            .callConstructor()
+            .callConstructor(Order, (call, from) => call(0, null, from.name))
             .properties((x) => [x.id, x.type])
-            .property((x) => x.date, (x) => x.date)
+            .property((x) => x.age, (x) => x.age)
+            .property((x) => x.date, (x) => x.date, async (_, from) => await this.dateService.get(from.id))
+            .complex((x) => x.items, (x) => x.items)
+            .fill(async (from) => await this.ownerService.getByOrderId(from.id), (x) => x.owner)
             .byRule((x) => x.user, (x) => x.user, mapper.withRule(UserEntity, User))
             .validate(OrderValidator);
 
@@ -278,9 +285,11 @@ function callConstructor<ToConstructor extends ConstructorType<To>>(toConstructo
 ```
 
 ### _validate_
+The method indicates the need for validation of mapping results. When calling with an empty argument, the default validator specified in the settings will be used.
+<br/>The function argument (**validator**) points to a class that should implement the validation logic specifically for this entity. Note that the specified validator must extend the **BaseMapperValidator**.
 ```typescript
 validate()
-validate(AnyMapperValidator)
+validate(SomeMapperValidator)
 ```
 Typing:
 ```typescript
@@ -290,8 +299,26 @@ function validate<T extends BaseMapperValidator>(validator: MapperValidator<T, T
 
 ## Validators
 ### Set default validator
+```typescript
+MapperSettings.setSettings({
+    defaultValidator: DefaultMapperValidator,
+});
+```
+
 ### Set custom validator by Rule
+```typescript
+class OrderProfile extends BaseMapperProfile {
+    async define(mapper: ProfileMapperInterface) {
+        mapper
+            .addRule(OrderEntity, Order)
+            // ...
+            .validate(OrderValidator);
+    }
+}
+```
+
 ### _validate_
+The method that will be called for each object that has been mapped. It must be typed according to the types of the rule in which it is defined.
 ```typescript
 export class OrderValidator extends BaseMapperValidator {
     async validate(item: Order) {
@@ -304,26 +331,73 @@ Typing:
 function validate(item: any): Promise<void>
 ```
 
+## Raw usage
+If you want to use libraries without framework integrations or write your own integration, you can use a low-level flow.
+
+### Without DI
+```typescript
+MapperSettings.setSettings({
+    defaultValidator: DefaultMapperValidator, // Installing the default validator
+});
+
+MapperSettings.addProfile(SomeProfile); // Adding the mapping profile constructor function
+MapperSettings.addCustomValidatorInstance(new SomeMapperValidator()); // Defining a custom validator
+
+MapperSettings.collectProfiles(); // We collect and optimize profiles when launching the application
+
+mapper = MapperSettings.getMapper(); // Getting the mapper
+```
+
+### For DI
+Please note, when working in the **CollectType.DI** an attempt to reinitialize objects extending **BaseMapperProfile** or **BaseMapperValidator** will be ignored.
+<br/>All instances extending **BaseMapperProfile** and **BaseMapperValidator** should use **scope singleton**, both for themselves and for the dependencies that are injected into them. This is necessary for the proper operation of **optimization** processes that run when the application is launched.
+```typescript
+MapperSettings.setSettings({
+    collectType: CollectType.DI,
+    defaultValidator: DefaultMapperValidator, // Installing the default validator
+});
+
+// Registering dependencies via DI
+// It is necessary for DII to create profile instances and validators
+
+MapperSettings.collectProfileInstances(); // Добавляем в маппер профили, инстансы которых были созданны через DI
+
+mapper = MapperSettings.getMapper(); // Getting the mappe
+```
+
 ## Errors description
 ### Settings Errors
-- ```The function is only available when using the **TYPE** collect type```
+- ```The function is only available when using the **TYPE** collect type```<br/>
+It will be thrown out if you try to use a function with an inappropriate type of mapper settings. For example, if in **CollectType.DI** mode you are trying to call MapperSettings.collectProfiles().
+
 ### Profile Errors
-- ```The object is not an inheritor of BaseMapperProfile```
-- ```An instance of the profile '**PROFILE NAME**' has already been created```
+- ```The object does not extend the BaseMapperValidator```<br/>
+It will be thrown if the class specified as the profile does not extend the base class **BaseMapperProfile**.
+- ```An instance of the profile '**PROFILE NAME**' has already been created```<br/>
+It will be thrown if you try to recreate an instance of a profile that has already been created before.
+
 ### Rule Errors
-- ```No rules found for '**FROM PROPERTY NAME**'```
-- ```Rule for '**FROM PROPERTY NAME**' and '**TO PROPERTY NAME**' not found```
-- ```The rule for '**FROM PROPERTY NAME**' and '**TO PROPERTY NAME**' has already been added to the mapper```
+- ```No rules found for '**FROM NAME**'```<br/>
+It will be thrown if you are trying to start mapping an object for which no mapping rules have been defined to other prototypes.
+- ```Rule for '**FROM PROPERTY NAME**' and '**TO PROPERTY NAME**' not found```<br/>
+The rule for mapping entities based on the specified prototype was not registered when building profiles. Double-check the correctness of the definition of rules and the assembly of profiles when launching the application.
+- ```The rule for '**FROM PROPERTY NAME**' and '**TO PROPERTY NAME**' has already been added to the mapper```<br/>
+It will be thrown out if you try to add a rule through the profile for a couple of prototypes, the rule for which has already been added earlier.
 ### Fill Errors
-- ```The rule for the '**TO PROPERTY NAME**' property has already been added to the mapper```
-- ```A rule has already been defined for the '**TO PROPERTY NAME**' property in 'properties' or 'complexity'```
+- ```The rule for the '**TO PROPERTY NAME**' property has already been added to the mapper```<br/>
+It will be thrown if you are trying to define a rule for filling in a property for which a fill rule has already been added.
+- ```A rule has already been defined for the '**TO PROPERTY NAME**' property in 'properties' or 'complexity'```<br/>
+  It will be thrown if mapping rules of the **properties** or **complexity** type have already been defined for this property. The rules for definitions via fill have the **lowest priority**.
 ### Validator Errors
-- ```The object is not an inheritor of the BaseMapperValidator```
+- ```The object does not extend the BaseMapperValidator```
+It will be thrown if the class specified as the validator (for example, in .validate()) does not extend (or inherit) the base class of validators, **BaseMapperValidator**.
 - ```An instance of the validator '**VALIDATOR NAME**' has already been created```
+An error will be thrown if you try to recreate the validator instance.
 - ```The validator '**VALIDATOR NAME**' was not found```
+An error will be thrown if in the method .validate(SomeValidator) the validator whose instance has not yet been created is specified. Double-check whether this validator is registered in DI.
 - ```The default validator is not installed```
+An error will be thrown if the default validator has not been installed (via MapperSettings.setSettings) and the rule has been registered .validate() without specifying a custom validator.
 - ```The default or custom validator is not defined```
+It will be thrown if no default or custom validator has been installed, or the c rule has been registered .validate().
 - ```The validator is disabled for this rule```
 - ```There is no custom validator defined for the rule '**FROM PROPERTY NAME** and '**TO PROPERTY NAME**' and there is no default validator```
-
-## Examples

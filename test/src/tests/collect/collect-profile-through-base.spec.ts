@@ -31,6 +31,7 @@ describe('...', () => {
     const profile = new SimpleProfile();
 
     MapperSettings.collectProfileInstances();
+    MapperSettings.addCustomValidatorInstance();
 
     mapper = MapperSettings.getMapper();
   });

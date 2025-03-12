@@ -7,7 +7,7 @@ import { BaseMapperValidator } from "../rule/validator/base-mapper-validator";
 import { Settings } from "./settings";
 import { CollectType } from "./enums/collect-type.enum";
 import { SettingsInterface } from "./interfaces/settings.interface";
-import {MapperInterface} from "../mapper/interfaces/mapper.interface";
+import { MapperInterface } from "../mapper/interfaces/mapper.interface";
 
 export class MapperSettings {
   private constructor() {}

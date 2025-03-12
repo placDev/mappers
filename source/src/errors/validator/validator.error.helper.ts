@@ -1,6 +1,6 @@
 export class ValidatorErrorHelper {
   static notExtendsValidator() {
-    return `The object is not an inheritor of the BaseMapperValidator`;
+    return `The object does not extend the BaseMapperValidator`;
   }
 
   static alredyCreated(validatorName: string) {
