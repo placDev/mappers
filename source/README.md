@@ -17,7 +17,8 @@ A fast, simple, and powerful library that helps you design your application **la
 - [Rules](#rules)
 - [Validators](#validators)
 - [Raw usage](#raw-usage)
-- [Error description](#error-description)
+- [Errors description](#errors-description)
+- [Future changes](#future-changes)
 
 ## Installation
 
@@ -43,7 +44,7 @@ For example:<br>
 Or any other set of layers you need :)
 
 ## Examples
-You can see the example by clicking on the link [Examples](https://github.com/placDev/mappers)
+You can see the example by clicking on the link [Examples](https://github.com/placDev/mappers/tree/main/examples)
 
 ## Glossary
 ##### _1) Mapper_
@@ -360,7 +361,7 @@ MapperSettings.setSettings({
 // Registering dependencies via DI
 // It is necessary for DII to create profile instances and validators
 
-MapperSettings.collectProfileInstances(); // Добавляем в маппер профили, инстансы которых были созданны через DI
+MapperSettings.collectProfileInstances(); // Adding profiles to the mapper, the instances of which were created via DI
 
 mapper = MapperSettings.getMapper(); // Getting the mappe
 ```
@@ -401,3 +402,9 @@ An error will be thrown if the default validator has not been installed (via Map
 It will be thrown if no default or custom validator has been installed, or the c rule has been registered .validate().
 - ```The validator is disabled for this rule```
 - ```There is no custom validator defined for the rule '**FROM PROPERTY NAME** and '**TO PROPERTY NAME**' and there is no default validator```
+
+## Future changes
+### 1.1.0
+- Dynamic assembly of mapping rules
+Allows you to use more than just Singleton scope for DI
+- Performance improvement
