@@ -1,6 +1,6 @@
 {
   "name": "@mappers/core",
-  "version": "0.0.19",
+  "version": "1.0.0",
   "description": "A versatile and powerful tool that allows you to organize convenient mapping between the layers of your application",
   "keywords": [
     "mapper",
@@ -27,7 +27,7 @@
     "url": "https://github.com/placDev/mappers.git"
   },
   "scripts": {
-    "compile": "tsc",
+    "compile": "tsc --project tsconfig.build.json",
     "copy-readme": "cp ./../README.md ./README.md",
     "build": "npm run compile && npm run copy-readme",
     "test-build": "tsc && npm pack",
@@ -35,12 +35,12 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
-    "typescript": "^5.4.2",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0"
+    "eslint-plugin-prettier": "^5.0.0",
+    "typescript": "^5.4.2"
   },
   "dependencies": {
     "class-transformer": "^0.5.1"

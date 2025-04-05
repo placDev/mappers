@@ -17,7 +17,8 @@ A fast, simple, and powerful library that helps you design your application **la
 - [Rules](#rules)
 - [Validators](#validators)
 - [Raw usage](#raw-usage)
-- [Error description](#error-description)
+- [Errors description](#errors-description)
+- [Future changes](#future-changes)
 
 ## Installation
 
@@ -43,7 +44,7 @@ For example:<br>
 Or any other set of layers you need :)
 
 ## Examples
-You can see the example by clicking on the link [Examples](https://github.com/placDev/mappers)
+You can see the example by clicking on the link [Examples](https://github.com/placDev/mappers/tree/main/examples)
 
 ## Glossary
 ##### _1) Mapper_
@@ -360,7 +361,7 @@ MapperSettings.setSettings({
 // Registering dependencies via DI
 // It is necessary for DII to create profile instances and validators
 
-MapperSettings.collectProfileInstances(); // Добавляем в маппер профили, инстансы которых были созданны через DI
+MapperSettings.collectProfileInstances(); // Adding profiles to the mapper, the instances of which were created via DI
 
 mapper = MapperSettings.getMapper(); // Getting the mappe
 ```
@@ -389,15 +390,21 @@ It will be thrown if you are trying to define a rule for filling in a property f
 - ```A rule has already been defined for the '**TO PROPERTY NAME**' property in 'properties' or 'complexity'```<br/>
   It will be thrown if mapping rules of the **properties** or **complexity** type have already been defined for this property. The rules for definitions via fill have the **lowest priority**.
 ### Validator Errors
-- ```The object does not extend the BaseMapperValidator```
+- ```The object does not extend the BaseMapperValidator```<br/>
 It will be thrown if the class specified as the validator (for example, in .validate()) does not extend (or inherit) the base class of validators, **BaseMapperValidator**.
-- ```An instance of the validator '**VALIDATOR NAME**' has already been created```
+- ```An instance of the validator '**VALIDATOR NAME**' has already been created```<br/>
 An error will be thrown if you try to recreate the validator instance.
-- ```The validator '**VALIDATOR NAME**' was not found```
+- ```The validator '**VALIDATOR NAME**' was not found```<br/>
 An error will be thrown if in the method .validate(SomeValidator) the validator whose instance has not yet been created is specified. Double-check whether this validator is registered in DI.
-- ```The default validator is not installed```
+- ```The default validator is not installed```<br/>
 An error will be thrown if the default validator has not been installed (via MapperSettings.setSettings) and the rule has been registered .validate() without specifying a custom validator.
-- ```The default or custom validator is not defined```
+- ```The default or custom validator is not defined```<br/>
 It will be thrown if no default or custom validator has been installed, or the c rule has been registered .validate().
 - ```The validator is disabled for this rule```
 - ```There is no custom validator defined for the rule '**FROM PROPERTY NAME** and '**TO PROPERTY NAME**' and there is no default validator```
+
+## Future changes
+### 1.1.0
+- Dynamic assembly of mapping rules
+Allows you to use more than just Singleton scope for DI
+- Performance improvement
